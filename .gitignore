@@ -5,6 +5,9 @@ Package.resolved
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 
+# XcodeGen generates this from project.yml
+*.xcodeproj/
+
 # Xcode
 xcuserdata/
 DerivedData/
