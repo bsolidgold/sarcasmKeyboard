@@ -1,0 +1,11 @@
+#!/bin/sh
+# Reject any commit that credits Claude as a co-author.
+# Enforced for this repo via `git config core.hooksPath .githooks`.
+
+if grep -qiE '^Co-Authored-By:.*Claude' "$1"; then
+    echo "" >&2
+    echo "ERROR: Commit rejected." >&2
+    echo "This repo disallows 'Co-Authored-By: Claude ...' trailers." >&2
+    echo "Edit the commit message and remove the line, then commit again." >&2
+    exit 1
+fi
