@@ -21,6 +21,9 @@ DerivedData/
 .vscode/
 .idea/
 
+# Claude Code local data / installed skills
+.claude/
+
 # Secrets
 *.p8
 *.p12

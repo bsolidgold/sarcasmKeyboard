@@ -7,6 +7,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        KeyboardStatus.recordHeartbeat()
 
         let view = KeyboardView(
             onLetter: { [weak self] char in self?.handleLetter(char) },

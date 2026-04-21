@@ -3,101 +3,187 @@ import SarcasmKit
 
 struct ContentView: View {
     @State private var selectedPatternID: String = SharedDefaults.selectedPatternID
-    @State private var previewInput: String = "the quick brown fox"
+    @State private var playgroundInput: String = "the quick brown fox"
+    @State private var needsSetup: Bool = KeyboardStatus.shouldShowSetupBanner
+    @State private var showInstallGuide = false
+    @State private var proPatternToUpsell: AnyHashablePattern?
 
     private var patterns: [any SarcasmPattern] { SarcasmEngine.allPatterns }
+    private var currentPattern: any SarcasmPattern {
+        SarcasmEngine.pattern(id: selectedPatternID) ?? AlternatingPattern()
+    }
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    HowToInstallRow()
+            List {
+                if needsSetup {
+                    setupSection
                 }
-
-                Section("Try it") {
-                    TextField("Type anything", text: $previewInput, axis: .vertical)
-                        .lineLimit(2...5)
-                    if let pattern = SarcasmEngine.pattern(id: selectedPatternID) {
-                        Text(pattern.transform(previewInput))
-                            .font(.body.monospaced())
-                            .foregroundStyle(.secondary)
+                playgroundSection
+                patternsSection
+                aboutSection
+            }
+            .listStyle(.insetGrouped)
+            .listSectionSpacing(.compact)
+            .navigationTitle(currentPattern.transform("Sarcasm Keyboard"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        rerollPattern()
+                    } label: {
+                        Image(systemName: "sparkles")
+                            .symbolEffect(.bounce, value: selectedPatternID)
                     }
-                }
-
-                Section("Pattern") {
-                    ForEach(patterns, id: \.id) { pattern in
-                        PatternRow(
-                            pattern: pattern,
-                            isSelected: pattern.id == selectedPatternID
-                        )
-                        .contentShape(Rectangle())
-                        .onTapGesture { select(pattern) }
-                    }
+                    .accessibilityLabel("Shuffle pattern")
                 }
             }
-            .navigationTitle("Sarcasm Keyboard")
+            .sheet(isPresented: $showInstallGuide) {
+                InstallGuideSheet()
+            }
+            .sheet(item: $proPatternToUpsell) { wrapper in
+                ProUpsellSheet(lockedPattern: wrapper.pattern)
+            }
+        }
+        .tint(.appAccent)
+    }
+
+    private func rerollPattern() {
+        let free = patterns.filter { !$0.isPremium && $0.id != selectedPatternID }
+        guard let next = free.randomElement() else { return }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            selectedPatternID = next.id
+        }
+        SharedDefaults.selectedPatternID = next.id
+    }
+
+    private var setupSection: some View {
+        Section {
+            Button {
+                showInstallGuide = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "keyboard.badge.ellipsis")
+                        .font(.callout)
+                        .foregroundStyle(.orange)
+                        .frame(width: 28, height: 28)
+                        .background(Color.orange.opacity(0.15), in: Circle())
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Install the keyboard")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("4 quick steps in iOS Settings")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .buttonStyle(.plain)
+        } footer: {
+            Text("Not sure if it's installed yet. Swipe left to dismiss forever.")
+                .font(.caption)
+        }
+        .listRowBackground(Color.orange.opacity(0.08))
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                withAnimation {
+                    KeyboardStatus.isSetupBannerDismissed = true
+                    needsSetup = false
+                }
+            } label: {
+                Label("Dismiss", systemImage: "xmark")
+            }
         }
     }
 
-    private func select(_ pattern: any SarcasmPattern) {
+    private var playgroundSection: some View {
+        Section {
+            TextField("Type something to transform", text: $playgroundInput, axis: .vertical)
+                .font(.subheadline)
+                .lineLimit(1...3)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "arrow.turn.down.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.appAccent)
+                    .padding(.top, 2)
+                Text(currentPattern.transform(playgroundInput.isEmpty ? "type something to see it transformed" : playgroundInput))
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(Color.appAccent)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        } header: {
+            Text("Try it")
+        } footer: {
+            Text("Preview only — the keyboard transforms text as you type in any app.")
+        }
+    }
+
+    private var patternsSection: some View {
+        Section {
+            ForEach(patterns, id: \.id) { pattern in
+                Button {
+                    tap(pattern)
+                } label: {
+                    PatternRow(
+                        pattern: pattern,
+                        isSelected: pattern.id == selectedPatternID
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        } header: {
+            Text("Style")
+        } footer: {
+            Text("Free patterns work right away. Pro unlocks the sparkly stuff.")
+        }
+    }
+
+    private var aboutSection: some View {
+        Section {
+            HStack {
+                Label("Version", systemImage: "info.circle")
+                Spacer()
+                Text("0.1.0")
+                    .foregroundStyle(.secondary)
+                    .font(.callout.monospacedDigit())
+            }
+        } header: {
+            Text("About")
+        }
+    }
+
+    private func tap(_ pattern: any SarcasmPattern) {
+        if pattern.isPremium {
+            proPatternToUpsell = AnyHashablePattern(pattern: pattern)
+            return
+        }
         selectedPatternID = pattern.id
         SharedDefaults.selectedPatternID = pattern.id
     }
 }
 
-private struct PatternRow: View {
-    let pattern: any SarcasmPattern
-    let isSelected: Bool
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(pattern.displayName)
-                        .font(.body)
-                    if pattern.isPremium {
-                        Text("PRO")
-                            .font(.caption2.weight(.semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(.tint.opacity(0.15), in: Capsule())
-                            .foregroundStyle(.tint)
-                    }
-                }
-                Text(pattern.transform("the quick brown fox"))
-                    .font(.caption.monospaced())
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-            Spacer()
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .foregroundStyle(.tint)
-            }
-        }
-    }
+extension Color {
+    static let appAccent = Color(red: 0.92, green: 0.42, blue: 0.22)
 }
 
-private struct HowToInstallRow: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Install the keyboard")
-                .font(.headline)
-            Text("1. Open Settings › General › Keyboard › Keyboards")
-            Text("2. Tap \"Add New Keyboard\" and choose Sarcasm Keyboard")
-            Text("3. In any app, tap the globe icon to switch to it")
-            Button {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            } label: {
-                Text("Open Settings")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.top, 4)
-        }
-        .font(.subheadline)
+struct AnyHashablePattern: Identifiable, Hashable {
+    let pattern: any SarcasmPattern
+    var id: String { pattern.id }
+
+    static func == (lhs: AnyHashablePattern, rhs: AnyHashablePattern) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
