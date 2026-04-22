@@ -27,12 +27,12 @@ public struct IconView: View {
     public var body: some View {
         ZStack {
             background
-            VStack(spacing: -40) {
+            VStack(spacing: -110) {
                 ForEach(Self.rows, id: \.self) { row in
                     Text(row)
-                        .font(.system(size: 340, weight: .black, design: .rounded))
+                        .font(.system(size: 400, weight: .black, design: .rounded))
                         .foregroundStyle(foreground)
-                        .tracking(-18)
+                        .tracking(-24)
                 }
             }
         }
