@@ -194,11 +194,13 @@ use `Palette.default.ink` for consistency with the parent view.
 
 ### `Sources/SarcasmKit/Design/IconView.swift` (new)
 
-**Concept update (2026-04-21, per user direction):** The icon renders
-`AlternatingPattern().transform("sarcastic")` → `sArCaStIc` split into three
-rows of three (`sAr / CaS / tIc`), so the icon literally demonstrates the
-product's output on the product's name. Lime on ink, stacked VStack with
-tight negative spacing, SF Pro Rounded Black.
+**Concept update (2026-04-21, per user direction):** The icon spells the
+product's adjective (`sarcastic`) across three rows of three, in alternating
+case: `sAr / CaS / TiC`. The last row's casing is `TiC` (not the strict-
+alternation `tIc`) because at home-screen scale the tall rounded `I` reads
+as a lowercase `l`; the lowercase `i` with its dot anchors the row
+unambiguously. Lime on ink, SF Pro Rounded Black at 400pt, tight VStack
+with negative spacing (-180) so rows nearly touch.
 
 ```swift
 import SwiftUI
