@@ -2,6 +2,7 @@ import SwiftUI
 import SarcasmKit
 
 struct ContentView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selectedPatternID: String = SharedDefaults.selectedPatternID
     @State private var playgroundInput: String = "the quick brown fox"
     @State private var needsSetup: Bool = KeyboardStatus.shouldShowSetupBanner
@@ -12,6 +13,7 @@ struct ContentView: View {
     private var currentPattern: any SarcasmPattern {
         SarcasmEngine.pattern(id: selectedPatternID) ?? AlternatingPattern()
     }
+    private var accent: Color { Palette.default.accent(for: colorScheme) }
 
     var body: some View {
         NavigationStack {
@@ -47,15 +49,16 @@ struct ContentView: View {
                 ProUpsellSheet(lockedPattern: wrapper.pattern)
             }
         }
-        .tint(Palette.default.accent)
+        .tint(accent)
     }
 
     private func rerollPattern() {
-        let nextID = PatternCycler.next(currentID: selectedPatternID, in: patterns)
+        let free = patterns.filter { !$0.isPremium && $0.id != selectedPatternID }
+        guard let next = free.randomElement() else { return }
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            selectedPatternID = nextID
+            selectedPatternID = next.id
         }
-        SharedDefaults.selectedPatternID = nextID
+        SharedDefaults.selectedPatternID = next.id
     }
 
     private var setupSection: some View {
@@ -66,9 +69,9 @@ struct ContentView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "keyboard.badge.ellipsis")
                         .font(.callout)
-                        .foregroundStyle(Palette.default.accent)
+                        .foregroundStyle(accent)
                         .frame(width: 28, height: 28)
-                        .background(Palette.default.accent.opacity(0.15), in: Circle())
+                        .background(accent.opacity(0.15), in: Circle())
                     VStack(alignment: .leading, spacing: 1) {
                         Text("Install the keyboard")
                             .font(.subheadline.weight(.semibold))
@@ -88,7 +91,7 @@ struct ContentView: View {
             Text("Not sure if it's installed. Swipe left to dismiss.")
                 .font(.caption)
         }
-        .listRowBackground(Palette.default.accent.opacity(0.10))
+        .listRowBackground(accent.opacity(0.10))
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 withAnimation {
@@ -112,11 +115,11 @@ struct ContentView: View {
             HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "arrow.turn.down.right")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(Palette.default.accent)
+                    .foregroundStyle(accent)
                     .padding(.top, 2)
                 Text(currentPattern.transform(playgroundInput.isEmpty ? "type something to see it transformed" : playgroundInput))
                     .font(.sarcasmMono)
-                    .foregroundStyle(Palette.default.accent)
+                    .foregroundStyle(accent)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
