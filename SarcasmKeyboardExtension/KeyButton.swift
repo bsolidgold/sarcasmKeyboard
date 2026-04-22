@@ -1,4 +1,5 @@
 import SwiftUI
+import SarcasmKit
 
 struct KeyButton: View {
     enum Style {
@@ -15,18 +16,24 @@ struct KeyButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(style == .letter ? .title3 : .callout)
-                .foregroundColor(.primary)
+                .font(style == .letter ? .sarcasmMono : .sarcasmMonoSmall)
+                .foregroundColor(Palette.default.text)
                 .frame(maxWidth: .infinity)
                 .frame(height: 42)
                 .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(backgroundColor)
-                        .shadow(color: .black.opacity(0.2), radius: 0, x: 0, y: 1)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .fill(isPressed ? Palette.default.accent.opacity(0.30) : backgroundColor)
+                        VStack(spacing: 0) {
+                            Palette.default.topHighlight
+                                .frame(height: 1)
+                            Color.clear
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    }
                 )
         }
         .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.96 : 1.0)
         .animation(.easeOut(duration: 0.08), value: isPressed)
         .gesture(
             DragGesture(minimumDistance: 0)
@@ -37,8 +44,8 @@ struct KeyButton: View {
 
     private var backgroundColor: Color {
         switch style {
-        case .letter: return Color(.systemBackground)
-        case .system: return Color(.systemGray3)
+        case .letter: return Palette.default.keyFill
+        case .system: return Palette.default.systemKeyFill
         }
     }
 }
