@@ -68,7 +68,7 @@ struct KeyButton: View {
                 .font(style == .letter ? .sarcasmMono : .sarcasmMonoSmall)
         case .icon(let name):
             Image(systemName: name)
-                .font(.system(size: 22, weight: .regular))
+                .font(.system(size: 18, weight: .regular))
         }
     }
 
