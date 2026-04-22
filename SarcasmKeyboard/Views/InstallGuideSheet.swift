@@ -4,6 +4,8 @@ import SarcasmKit
 
 struct InstallGuideSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    private var accent: Color { Palette.default.accent(for: colorScheme) }
 
     var body: some View {
         NavigationStack {
@@ -47,7 +49,7 @@ struct InstallGuideSheet: View {
                         }
                     } label: {
                         Label("Open Settings", systemImage: "arrow.up.right.square.fill")
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(accent)
                     }
                 }
             }
@@ -66,11 +68,11 @@ struct InstallGuideSheet: View {
         HStack(alignment: .top, spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.accentColor.opacity(0.15))
+                    .fill(accent.opacity(0.15))
                     .frame(width: 32, height: 32)
                 Text("\(number)")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(accent)
             }
             VStack(alignment: .leading, spacing: 3) {
                 Label {

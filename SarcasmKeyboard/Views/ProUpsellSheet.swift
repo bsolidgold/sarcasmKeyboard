@@ -4,6 +4,8 @@ import SarcasmKit
 struct ProUpsellSheet: View {
     let lockedPattern: any SarcasmPattern
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    private var accent: Color { Palette.default.accent(for: colorScheme) }
 
     var body: some View {
         NavigationStack {
@@ -12,7 +14,7 @@ struct ProUpsellSheet: View {
                     VStack(spacing: 10) {
                         Image(systemName: "sparkles")
                             .font(.system(size: 44, weight: .semibold))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(accent)
                             .padding(.top, 20)
                         Text("Sarcasm Keyboard Pro")
                             .font(.largeTitle.weight(.bold))
@@ -78,9 +80,9 @@ struct ProUpsellSheet: View {
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(accent)
                 .frame(width: 36, height: 36)
-                .background(Color.accentColor.opacity(0.15), in: Circle())
+                .background(accent.opacity(0.15), in: Circle())
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.body.weight(.semibold))
                 Text(detail).font(.subheadline).foregroundStyle(.secondary)
