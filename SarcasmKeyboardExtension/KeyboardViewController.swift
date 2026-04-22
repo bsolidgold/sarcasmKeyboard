@@ -31,7 +31,6 @@ final class KeyboardViewController: UIInputViewController {
             onSpace:        { [weak self] in self?.handleLetter(" ") },
             onDelete:       { [weak self] in self?.textDocumentProxy.deleteBackward() },
             onReturn:       { [weak self] in self?.textDocumentProxy.insertText("\n") },
-            onGlobe:        { [weak self] in self?.advanceToNextInputMode() },
             onCyclePattern: { [weak self] in self?.cyclePattern() },
             currentPattern: SharedDefaults.selectedPattern,
             palette:        SharedDefaults.selectedTheme.palette

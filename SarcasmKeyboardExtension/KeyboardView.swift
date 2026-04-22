@@ -7,14 +7,30 @@ struct KeyboardView: View {
     let onSpace: () -> Void
     let onDelete: () -> Void
     let onReturn: () -> Void
-    let onGlobe: () -> Void
     let onCyclePattern: () -> Void
     let currentPattern: any SarcasmPattern
     let palette: Palette
 
-    private let row1: [Character] = ["q","w","e","r","t","y","u","i","o","p"]
-    private let row2: [Character] = ["a","s","d","f","g","h","j","k","l"]
-    private let row3: [Character] = ["z","x","c","v","b","n","m"]
+    @State private var layout: Layout = .letters
+
+    private enum Layout {
+        case letters, numbers, symbols
+    }
+
+    // Letters (QWERTY — no shift, see product note)
+    private let lettersRow1: [Character] = ["q","w","e","r","t","y","u","i","o","p"]
+    private let lettersRow2: [Character] = ["a","s","d","f","g","h","j","k","l"]
+    private let lettersRow3: [Character] = ["z","x","c","v","b","n","m"]
+
+    // Numbers (123)
+    private let numbersRow1: [Character] = ["1","2","3","4","5","6","7","8","9","0"]
+    private let numbersRow2: [Character] = ["-","/",":",";","(",")","$","&","@","\""]
+    // Row 3 of numbers + symbols share these punctuation keys.
+    private let punctRow3:   [Character] = [".",",","?","!","'"]
+
+    // Symbols (#+=)
+    private let symbolsRow1: [Character] = ["[","]","{","}","#","%","^","*","+","="]
+    private let symbolsRow2: [Character] = ["_","\\","|","~","<",">","€","£","¥","•"]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,28 +40,12 @@ struct KeyboardView: View {
         .background(palette.ink)
     }
 
-    private var keyRows: some View {
+    @ViewBuilder private var keyRows: some View {
         VStack(spacing: 6) {
-            letterRow(row1)
-            letterRow(row2)
-                .padding(.horizontal, 18)
-            HStack(spacing: 6) {
-                ForEach(Array(row3), id: \.self) { c in
-                    KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
-                }
-                KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
-                    .frame(width: 56)
-            }
-            HStack(spacing: 6) {
-                KeyButton(label: "🌐", style: .system, palette: palette, action: onGlobe)
-                    .frame(width: 44)
-                KeyButton(label: ".", style: .system, palette: palette) { onPunctuation(".") }
-                    .frame(width: 40)
-                KeyButton(label: ",", style: .system, palette: palette) { onPunctuation(",") }
-                    .frame(width: 40)
-                KeyButton(label: "space", style: .system, palette: palette, action: onSpace)
-                KeyButton(label: "return", style: .system, palette: palette, action: onReturn)
-                    .frame(width: 80)
+            switch layout {
+            case .letters: lettersLayout
+            case .numbers: numbersLayout
+            case .symbols: symbolsLayout
             }
         }
         .padding(.vertical, 6)
@@ -53,11 +53,80 @@ struct KeyboardView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: Layouts
+
+    @ViewBuilder private var lettersLayout: some View {
+        letterRow(lettersRow1)
+        letterRow(lettersRow2)
+            .padding(.horizontal, 18)
+        HStack(spacing: 6) {
+            ForEach(Array(lettersRow3), id: \.self) { c in
+                KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
+            }
+            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+                .frame(width: 56)
+        }
+        bottomRow(switcherLabel: "123") { layout = .numbers }
+    }
+
+    @ViewBuilder private var numbersLayout: some View {
+        charRow(numbersRow1, transform: false)
+        charRow(numbersRow2, transform: false)
+        HStack(spacing: 6) {
+            KeyButton(label: "#+=", style: .system, palette: palette) { layout = .symbols }
+                .frame(width: 56)
+            ForEach(Array(punctRow3), id: \.self) { c in
+                KeyButton(label: String(c), style: .letter, palette: palette) { onPunctuation(c) }
+            }
+            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+                .frame(width: 56)
+        }
+        bottomRow(switcherLabel: "ABC") { layout = .letters }
+    }
+
+    @ViewBuilder private var symbolsLayout: some View {
+        charRow(symbolsRow1, transform: false)
+        charRow(symbolsRow2, transform: false)
+        HStack(spacing: 6) {
+            KeyButton(label: "123", style: .system, palette: palette) { layout = .numbers }
+                .frame(width: 56)
+            ForEach(Array(punctRow3), id: \.self) { c in
+                KeyButton(label: String(c), style: .letter, palette: palette) { onPunctuation(c) }
+            }
+            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+                .frame(width: 56)
+        }
+        bottomRow(switcherLabel: "ABC") { layout = .letters }
+    }
+
+    // MARK: Row helpers
+
     private func letterRow(_ chars: [Character]) -> some View {
         HStack(spacing: 6) {
             ForEach(Array(chars), id: \.self) { c in
                 KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
             }
+        }
+    }
+
+    /// Row of characters inserted raw (no sarcasm transform). Used by numbers/symbols.
+    private func charRow(_ chars: [Character], transform: Bool) -> some View {
+        HStack(spacing: 6) {
+            ForEach(Array(chars), id: \.self) { c in
+                KeyButton(label: String(c), style: .letter, palette: palette) {
+                    transform ? onLetter(c) : onPunctuation(c)
+                }
+            }
+        }
+    }
+
+    private func bottomRow(switcherLabel: String, switcherAction: @escaping () -> Void) -> some View {
+        HStack(spacing: 6) {
+            KeyButton(label: switcherLabel, style: .system, palette: palette, action: switcherAction)
+                .frame(width: 64)
+            KeyButton(label: "space", style: .system, palette: palette, action: onSpace)
+            KeyButton(label: "return", style: .system, palette: palette, action: onReturn)
+                .frame(width: 80)
         }
     }
 }
