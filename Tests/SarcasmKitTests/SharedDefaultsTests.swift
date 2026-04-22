@@ -25,4 +25,27 @@ final class SharedDefaultsTests: XCTestCase {
         SharedDefaults.defaults.setValue("nonsense", forKey: "sarcasm.selectedPatternID")
         XCTAssertEqual(SharedDefaults.selectedPattern.id, "alternating")
     }
+
+    // MARK: selectedThemeID
+
+    func testSelectedThemeIDDefaultsToAcid() {
+        SharedDefaults.defaults.removeObject(forKey: "sarcasm.selectedThemeID")
+        XCTAssertEqual(SharedDefaults.selectedThemeID, "acid")
+    }
+
+    func testSelectedThemeIDRoundTrip() {
+        SharedDefaults.defaults.removeObject(forKey: "sarcasm.selectedThemeID")
+        SharedDefaults.selectedThemeID = "neon"
+        XCTAssertEqual(SharedDefaults.selectedThemeID, "neon")
+    }
+
+    func testSelectedThemeResolvesTheme() {
+        SharedDefaults.selectedThemeID = "terminalGreen"
+        XCTAssertEqual(SharedDefaults.selectedTheme.id, "terminalGreen")
+    }
+
+    func testInvalidThemeIDFallsBackToAcid() {
+        SharedDefaults.defaults.setValue("bogus", forKey: "sarcasm.selectedThemeID")
+        XCTAssertEqual(SharedDefaults.selectedTheme.id, "acid")
+    }
 }

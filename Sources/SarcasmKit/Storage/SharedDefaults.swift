@@ -9,7 +9,10 @@ public enum SharedDefaults {
 
     private enum Keys {
         static let selectedPatternID = "sarcasm.selectedPatternID"
+        static let selectedThemeID   = "sarcasm.selectedThemeID"
     }
+
+    // MARK: Pattern
 
     public static var selectedPatternID: String {
         get { defaults.string(forKey: Keys.selectedPatternID) ?? AlternatingPattern().id }
@@ -18,5 +21,16 @@ public enum SharedDefaults {
 
     public static var selectedPattern: any SarcasmPattern {
         SarcasmEngine.pattern(id: selectedPatternID) ?? AlternatingPattern()
+    }
+
+    // MARK: Theme
+
+    public static var selectedThemeID: String {
+        get { defaults.string(forKey: Keys.selectedThemeID) ?? ThemeCatalog.acid.id }
+        set { defaults.setValue(newValue, forKey: Keys.selectedThemeID) }
+    }
+
+    public static var selectedTheme: Theme {
+        ThemeCatalog.theme(id: selectedThemeID) ?? ThemeCatalog.acid
     }
 }
