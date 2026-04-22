@@ -194,33 +194,51 @@ use `Palette.default.ink` for consistency with the parent view.
 
 ### `Sources/SarcasmKit/Design/IconView.swift` (new)
 
+**Concept update (2026-04-21, per user direction):** The icon renders
+`AlternatingPattern().transform("sarcastic")` → `sArCaStIc` split into three
+rows of three (`sAr / CaS / tIc`), so the icon literally demonstrates the
+product's output on the product's name. Lime on ink, stacked VStack with
+tight negative spacing, SF Pro Rounded Black.
+
 ```swift
 import SwiftUI
-import SarcasmKit
 
 public struct IconView: View {
-    public init() {}
+    public enum Variant { case primary, tinted }
+    public let variant: Variant
+    public init(variant: Variant = .primary) { self.variant = variant }
+
+    private static let rows: [String] = {
+        let t = AlternatingPattern().transform("sarcastic")  // "sArCaStIc"
+        return [
+            String(t.prefix(3)),
+            String(t.dropFirst(3).prefix(3)),
+            String(t.dropFirst(6).prefix(3))
+        ]
+    }()
 
     public var body: some View {
         ZStack {
-            Palette.default.ink
-            Text("aA")
-                .font(.system(size: 640, weight: .black, design: .rounded))
-                .foregroundStyle(Palette.default.accent)
-                .tracking(-40)    // tight butt-up between a and A
+            background
+            VStack(spacing: -40) {
+                ForEach(Self.rows, id: \.self) { row in
+                    Text(row)
+                        .font(.system(size: 340, weight: .black, design: .rounded))
+                        .foregroundStyle(foreground)
+                        .tracking(-18)
+                }
+            }
         }
         .frame(width: 1024, height: 1024)
     }
-}
-
-#Preview {
-    IconView().scaleEffect(0.25)
+    // background + foreground switch on variant — see implementation file.
 }
 ```
 
-The `aA` mark communicates the core idea: lowercase meets uppercase, which is what
-the keyboard does to every word. Lime on ink reads at every size from 1024px down
-to 60px (verified in the screenshot loop).
+Rationale: the `aA` earlier draft communicated "case flip" in one mark, but the
+stacked full-word version better conveys what the product actually does (and
+reads better as a recognizable word on a home screen). Lime on ink reads from
+1024px down to ~60pt; verified in the Simulator.
 
 ### `Tests/SarcasmKitTests/IconRenderer.swift` (new)
 

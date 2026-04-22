@@ -258,6 +258,11 @@ pattern (fall through to first free), and an all-Pro list (no-op)."
 
 - [ ] **Step 1: Create `IconView.swift`**
 
+> **Note (2026-04-21):** The original plan had the icon as `aA`. During Task 4
+> the user redirected the icon to stacked `sAr / CaS / tIc` — the product name
+> run through `AlternatingPattern` and split into three rows of three. The
+> updated code is below. Any future re-run of this task should use this version.
+
 ```swift
 import SwiftUI
 
@@ -273,13 +278,29 @@ public struct IconView: View {
         self.variant = variant
     }
 
+    /// Renders the literal output of AlternatingPattern on "sarcastic",
+    /// split into three rows of three — so the icon IS the product's output
+    /// on the product's name.
+    private static let rows: [String] = {
+        let transformed = AlternatingPattern().transform("sarcastic")  // "sArCaStIc"
+        return [
+            String(transformed.prefix(3)),
+            String(transformed.dropFirst(3).prefix(3)),
+            String(transformed.dropFirst(6).prefix(3))
+        ]
+    }()
+
     public var body: some View {
         ZStack {
             background
-            Text("aA")
-                .font(.system(size: 640, weight: .black, design: .rounded))
-                .foregroundStyle(foreground)
-                .tracking(-40)
+            VStack(spacing: -40) {
+                ForEach(Self.rows, id: \.self) { row in
+                    Text(row)
+                        .font(.system(size: 340, weight: .black, design: .rounded))
+                        .foregroundStyle(foreground)
+                        .tracking(-18)
+                }
+            }
         }
         .frame(width: 1024, height: 1024)
     }
