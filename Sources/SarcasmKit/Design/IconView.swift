@@ -12,23 +12,20 @@ public struct IconView: View {
         self.variant = variant
     }
 
-    /// Renders the literal output of AlternatingPattern on "sarcastic",
-    /// split into three rows of three — so the icon IS the product's output
-    /// on the product's name. Per-row tracking compensates for the narrow
-    /// `tIc` row ('t'/'I'/'c' are all skinnier than 'sAr'/'CaS').
-    private static let rows: [(text: String, tracking: CGFloat)] = {
-        let transformed = AlternatingPattern().transform("sarcastic")  // "sArCaStIc"
-        return [
-            (String(transformed.prefix(3)),                -24),
-            (String(transformed.dropFirst(3).prefix(3)),   -24),
-            (String(transformed.dropFirst(6).prefix(3)),    48)
-        ]
-    }()
+    /// Three rows of three, spelling "sarcastic" in alternating case. The
+    /// casing breaks the strict alternation on the last row (`TiC` rather than
+    /// the algorithm's `tIc`) so the lowercase `i` — with its visible dot —
+    /// doesn't read as an `l` at home-screen scale.
+    private static let rows: [(text: String, tracking: CGFloat)] = [
+        ("sAr", -24),
+        ("CaS", -24),
+        ("TiC", -18)
+    ]
 
     public var body: some View {
         ZStack {
             background
-            VStack(spacing: -140) {
+            VStack(spacing: -180) {
                 ForEach(Self.rows, id: \.text) { row in
                     Text(row.text)
                         .font(.system(size: 400, weight: .black, design: .rounded))
