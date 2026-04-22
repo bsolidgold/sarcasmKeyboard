@@ -2,10 +2,23 @@ import SwiftUI
 import SarcasmKit
 
 struct ProUpsellSheet: View {
-    let lockedPattern: any SarcasmPattern
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     private var accent: Color { Palette.default.accent(for: colorScheme) }
+
+    private let lockedItemName: String
+
+    // MARK: Inits
+
+    init(lockedPattern: any SarcasmPattern) {
+        self.lockedItemName = lockedPattern.displayName
+    }
+
+    init(lockedTheme: Theme) {
+        self.lockedItemName = lockedTheme.displayName
+    }
+
+    // MARK: Body
 
     var body: some View {
         NavigationStack {
@@ -66,7 +79,7 @@ struct ProUpsellSheet: View {
                     .padding(.bottom, 20)
                 }
             }
-            .navigationTitle(lockedPattern.displayName)
+            .navigationTitle(lockedItemName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
