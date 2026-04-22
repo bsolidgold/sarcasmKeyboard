@@ -9,16 +9,7 @@ final class KeyboardViewController: UIInputViewController {
         super.viewDidLoad()
         KeyboardStatus.recordHeartbeat()
 
-        let view = KeyboardView(
-            onLetter: { [weak self] char in self?.handleLetter(char) },
-            onPunctuation: { [weak self] char in self?.handlePunctuation(char) },
-            onSpace: { [weak self] in self?.handleLetter(" ") },
-            onDelete: { [weak self] in self?.textDocumentProxy.deleteBackward() },
-            onReturn: { [weak self] in self?.textDocumentProxy.insertText("\n") },
-            onGlobe: { [weak self] in self?.advanceToNextInputMode() }
-        )
-
-        let host = UIHostingController(rootView: view)
+        let host = UIHostingController(rootView: makeKeyboardView())
         host.view.translatesAutoresizingMaskIntoConstraints = false
         host.view.backgroundColor = .clear
         addChild(host)
@@ -33,6 +24,19 @@ final class KeyboardViewController: UIInputViewController {
         hostingController = host
     }
 
+    private func makeKeyboardView() -> KeyboardView {
+        KeyboardView(
+            onLetter: { [weak self] char in self?.handleLetter(char) },
+            onPunctuation: { [weak self] char in self?.handlePunctuation(char) },
+            onSpace: { [weak self] in self?.handleLetter(" ") },
+            onDelete: { [weak self] in self?.textDocumentProxy.deleteBackward() },
+            onReturn: { [weak self] in self?.textDocumentProxy.insertText("\n") },
+            onGlobe: { [weak self] in self?.advanceToNextInputMode() },
+            onCyclePattern: { [weak self] in self?.cyclePattern() },
+            currentPattern: SharedDefaults.selectedPattern
+        )
+    }
+
     private func handleLetter(_ char: Character) {
         let prior = textDocumentProxy.documentContextBeforeInput ?? ""
         let pattern = SharedDefaults.selectedPattern
@@ -42,5 +46,14 @@ final class KeyboardViewController: UIInputViewController {
 
     private func handlePunctuation(_ char: Character) {
         textDocumentProxy.insertText(String(char))
+    }
+
+    private func cyclePattern() {
+        let nextID = PatternCycler.next(
+            currentID: SharedDefaults.selectedPatternID,
+            in: SarcasmEngine.allPatterns
+        )
+        SharedDefaults.selectedPatternID = nextID
+        hostingController?.rootView = makeKeyboardView()
     }
 }
