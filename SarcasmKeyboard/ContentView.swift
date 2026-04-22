@@ -3,11 +3,13 @@ import SarcasmKit
 
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
     @State private var selectedPatternID: String = SharedDefaults.selectedPatternID
     @State private var playgroundInput: String = "the quick brown fox"
     @State private var needsSetup: Bool = KeyboardStatus.shouldShowSetupBanner
     @State private var showInstallGuide = false
     @State private var proPatternToUpsell: AnyHashablePattern?
+    @State private var hasAutoPresentedGuide = false
 
     private var patterns: [any SarcasmPattern] { SarcasmEngine.allPatterns }
     private var currentPattern: any SarcasmPattern {
@@ -50,6 +52,23 @@ struct ContentView: View {
             }
         }
         .tint(accent)
+        .task {
+            // On first appearance: if the keyboard isn't enabled yet, open the
+            // install guide immediately so the user doesn't have to find the
+            // setup banner. Only auto-presents once per app session.
+            guard !hasAutoPresentedGuide else { return }
+            hasAutoPresentedGuide = true
+            if KeyboardStatus.shouldShowSetupBanner {
+                showInstallGuide = true
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // When returning from Settings, re-check whether the keyboard is
+            // enabled so the setup banner hides itself automatically.
+            if phase == .active {
+                needsSetup = KeyboardStatus.shouldShowSetupBanner
+            }
+        }
     }
 
     private func rerollPattern() {
