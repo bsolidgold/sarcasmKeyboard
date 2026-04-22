@@ -23,8 +23,10 @@ struct ContentView: View {
                 patternsSection
                 aboutSection
             }
-            .listStyle(.insetGrouped)
+            .listStyle(.plain)
             .listSectionSpacing(.compact)
+            .scrollContentBackground(.hidden)
+            .background(Color(.systemBackground))
             .navigationTitle(currentPattern.transform("Sarcasm Keyboard"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -45,16 +47,15 @@ struct ContentView: View {
                 ProUpsellSheet(lockedPattern: wrapper.pattern)
             }
         }
-        .tint(.appAccent)
+        .tint(Palette.default.accent)
     }
 
     private func rerollPattern() {
-        let free = patterns.filter { !$0.isPremium && $0.id != selectedPatternID }
-        guard let next = free.randomElement() else { return }
+        let nextID = PatternCycler.next(currentID: selectedPatternID, in: patterns)
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            selectedPatternID = next.id
+            selectedPatternID = nextID
         }
-        SharedDefaults.selectedPatternID = next.id
+        SharedDefaults.selectedPatternID = nextID
     }
 
     private var setupSection: some View {
@@ -65,9 +66,9 @@ struct ContentView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "keyboard.badge.ellipsis")
                         .font(.callout)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Palette.default.accent)
                         .frame(width: 28, height: 28)
-                        .background(Color.orange.opacity(0.15), in: Circle())
+                        .background(Palette.default.accent.opacity(0.15), in: Circle())
                     VStack(alignment: .leading, spacing: 1) {
                         Text("Install the keyboard")
                             .font(.subheadline.weight(.semibold))
@@ -84,10 +85,10 @@ struct ContentView: View {
             }
             .buttonStyle(.plain)
         } footer: {
-            Text("Not sure if it's installed yet. Swipe left to dismiss forever.")
+            Text("Not sure if it's installed. Swipe left to dismiss.")
                 .font(.caption)
         }
-        .listRowBackground(Color.orange.opacity(0.08))
+        .listRowBackground(Palette.default.accent.opacity(0.10))
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 withAnimation {
@@ -111,11 +112,11 @@ struct ContentView: View {
             HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "arrow.turn.down.right")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.appAccent)
+                    .foregroundStyle(Palette.default.accent)
                     .padding(.top, 2)
                 Text(currentPattern.transform(playgroundInput.isEmpty ? "type something to see it transformed" : playgroundInput))
-                    .font(.system(.subheadline, design: .monospaced))
-                    .foregroundStyle(Color.appAccent)
+                    .font(.sarcasmMono)
+                    .foregroundStyle(Palette.default.accent)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -168,10 +169,6 @@ struct ContentView: View {
         selectedPatternID = pattern.id
         SharedDefaults.selectedPatternID = pattern.id
     }
-}
-
-extension Color {
-    static let appAccent = Color(red: 0.92, green: 0.42, blue: 0.22)
 }
 
 struct AnyHashablePattern: Identifiable, Hashable {
