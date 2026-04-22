@@ -33,16 +33,7 @@ public struct Palette: Sendable, Equatable {
         self.subtleText = subtleText
     }
 
-    public static let `default` = Palette(
-        ink: Color(hex: 0x0A0A0A),
-        keyFill: Color(hex: 0x1C1C1E),
-        systemKeyFill: Color(hex: 0x2C2C2E),
-        topHighlight: Color(hex: 0x3A3A3C),
-        accent: Color(hex: 0xB8FF2A),
-        accentOnLight: Color(hex: 0x3F7A00),
-        text: Color(hex: 0xF2F2F7),
-        subtleText: Color(hex: 0x8E8E93)
-    )
+    public static var `default`: Palette { ThemeCatalog.acid.palette }
 }
 
 extension Palette {
