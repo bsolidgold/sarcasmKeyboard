@@ -11,46 +11,63 @@ struct InstallGuideSheet: View {
         NavigationStack {
             List {
                 Section {
-                    stepRow(
-                        number: 1,
-                        title: "Open Settings",
-                        detail: "General › Keyboard › Keyboards",
-                        symbol: "gearshape.fill"
-                    )
-                    stepRow(
-                        number: 2,
-                        title: "Add New Keyboard",
-                        detail: "Pick \"Sarcasm Keyboard\" from the list",
-                        symbol: "plus.rectangle.on.rectangle"
-                    )
-                    stepRow(
-                        number: 3,
-                        title: "Allow Full Access",
-                        detail: "Optional. Only needed if you want history and haptics. Nothing you type leaves your device.",
-                        symbol: "lock.shield.fill"
-                    )
-                    stepRow(
-                        number: 4,
-                        title: "Tap the 🌐 globe",
-                        detail: "In any app, switch keyboards until Sarcasm Keyboard appears",
-                        symbol: "globe"
-                    )
+                    Button {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        HStack {
+                            Label("Open Settings", systemImage: "arrow.up.right.square.fill")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(accent)
+                            Spacer()
+                        }
+                    }
                 } header: {
-                    Text("Four steps. We regret to inform you Apple wouldn't let us do it for you.")
+                    Text("One tap, then three more inside Settings. Apple's rules.")
                         .textCase(nil)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
                 Section {
-                    Button {
-                        if let url = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(url)
-                        }
-                    } label: {
-                        Label("Open Settings", systemImage: "arrow.up.right.square.fill")
-                            .foregroundStyle(accent)
-                    }
+                    stepRow(
+                        number: 1,
+                        title: "Tap Keyboards",
+                        detail: "You'll land on the Sarcasm Keyboard settings page.",
+                        symbol: "keyboard"
+                    )
+                    stepRow(
+                        number: 2,
+                        title: "Toggle it on",
+                        detail: "Flip the switch next to \"Sarcasm Keyboard\".",
+                        symbol: "switch.2"
+                    )
+                    stepRow(
+                        number: 3,
+                        title: "Allow Full Access",
+                        detail: "Optional. Enables history and haptics. Nothing you type leaves your device.",
+                        symbol: "lock.shield.fill"
+                    )
+                } header: {
+                    Text("Inside Settings")
+                        .textCase(nil)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                }
+
+                Section {
+                    stepRow(
+                        number: 4,
+                        title: "Hold the 🌐 globe",
+                        detail: "In any app with a text field, hold the globe key on any keyboard and pick Sarcasm Keyboard.",
+                        symbol: "globe"
+                    )
+                } header: {
+                    Text("Then anywhere you type")
+                        .textCase(nil)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
                 }
             }
             .navigationTitle("How to install")
