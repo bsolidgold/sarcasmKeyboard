@@ -63,7 +63,7 @@ struct KeyboardView: View {
             ForEach(Array(lettersRow3), id: \.self) { c in
                 KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
             }
-            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+            KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
                 .frame(width: 56)
         }
         bottomRow(switcherLabel: "123") { layout = .numbers }
@@ -78,7 +78,7 @@ struct KeyboardView: View {
             ForEach(Array(punctRow3), id: \.self) { c in
                 KeyButton(label: String(c), style: .letter, palette: palette) { onPunctuation(c) }
             }
-            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+            KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
                 .frame(width: 56)
         }
         bottomRow(switcherLabel: "ABC") { layout = .letters }
@@ -93,7 +93,7 @@ struct KeyboardView: View {
             ForEach(Array(punctRow3), id: \.self) { c in
                 KeyButton(label: String(c), style: .letter, palette: palette) { onPunctuation(c) }
             }
-            KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
+            KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
                 .frame(width: 56)
         }
         bottomRow(switcherLabel: "ABC") { layout = .letters }

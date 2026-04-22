@@ -7,17 +7,35 @@ struct KeyButton: View {
         case system
     }
 
-    let label: String
+    enum Content {
+        case text(String)
+        case icon(String) // SF Symbol name
+    }
+
+    let content: Content
     let style: Style
     let palette: Palette
     let action: () -> Void
 
     @State private var isPressed = false
 
+    init(label: String, style: Style, palette: Palette, action: @escaping () -> Void) {
+        self.content = .text(label)
+        self.style = style
+        self.palette = palette
+        self.action = action
+    }
+
+    init(icon: String, style: Style, palette: Palette, action: @escaping () -> Void) {
+        self.content = .icon(icon)
+        self.style = style
+        self.palette = palette
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
-            Text(label)
-                .font(style == .letter ? .sarcasmMono : .sarcasmMonoSmall)
+            labelView
                 .foregroundColor(palette.text)
                 .frame(maxWidth: .infinity)
                 .frame(height: 42)
@@ -41,6 +59,17 @@ struct KeyButton: View {
                 .onChanged { _ in isPressed = true }
                 .onEnded { _ in isPressed = false }
         )
+    }
+
+    @ViewBuilder private var labelView: some View {
+        switch content {
+        case .text(let str):
+            Text(str)
+                .font(style == .letter ? .sarcasmMono : .sarcasmMonoSmall)
+        case .icon(let name):
+            Image(systemName: name)
+                .font(.system(size: 22, weight: .regular))
+        }
     }
 
     private var backgroundColor: Color {
