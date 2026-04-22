@@ -2,20 +2,22 @@ import SwiftUI
 import SarcasmKit
 
 struct PatternRow: View {
+    @Environment(\.colorScheme) private var colorScheme
     let pattern: any SarcasmPattern
     let isSelected: Bool
 
     private let sampleText = "The quick brown fox jumps"
+    private var accent: Color { Palette.default.accent(for: colorScheme) }
 
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(isSelected ? Color.accentColor.opacity(0.15) : Color(.tertiarySystemFill))
+                    .fill(isSelected ? accent.opacity(0.15) : Color(.tertiarySystemFill))
                     .frame(width: 28, height: 28)
                 Image(systemName: isSelected ? "checkmark" : symbolName)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                    .foregroundStyle(isSelected ? accent : .secondary)
             }
 
             VStack(alignment: .leading, spacing: 1) {
@@ -26,11 +28,11 @@ struct PatternRow: View {
                     if pattern.isPremium {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(accent)
                     }
                 }
                 Text(pattern.transform(sampleText))
-                    .font(.system(.caption, design: .monospaced))
+                    .font(.sarcasmMonoSmall)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
