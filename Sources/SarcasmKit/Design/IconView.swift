@@ -12,13 +12,29 @@ public struct IconView: View {
         self.variant = variant
     }
 
+    /// Renders the literal output of AlternatingPattern on "sarcastic",
+    /// split into three rows of three — so the icon IS the product's output
+    /// on the product's name.
+    private static let rows: [String] = {
+        let transformed = AlternatingPattern().transform("sarcastic")  // "sArCaStIc"
+        return [
+            String(transformed.prefix(3)),
+            String(transformed.dropFirst(3).prefix(3)),
+            String(transformed.dropFirst(6).prefix(3))
+        ]
+    }()
+
     public var body: some View {
         ZStack {
             background
-            Text("aA")
-                .font(.system(size: 640, weight: .black, design: .rounded))
-                .foregroundStyle(foreground)
-                .tracking(-40)
+            VStack(spacing: -40) {
+                ForEach(Self.rows, id: \.self) { row in
+                    Text(row)
+                        .font(.system(size: 340, weight: .black, design: .rounded))
+                        .foregroundStyle(foreground)
+                        .tracking(-18)
+                }
+            }
         }
         .frame(width: 1024, height: 1024)
     }
