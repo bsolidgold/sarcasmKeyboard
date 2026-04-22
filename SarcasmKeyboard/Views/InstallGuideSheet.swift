@@ -40,9 +40,9 @@ struct InstallGuideSheet: View {
                 Section {
                     stepRow(
                         number: 1,
-                        title: "Search for Sarcasm",
-                        detail: "In Settings, tap the search bar at the top and type \"Sarcasm\". Tap Sarcasm Keyboard in the results.",
-                        symbol: "magnifyingglass"
+                        title: "Scroll to Apps",
+                        detail: "Scroll down in Settings, tap Apps, then tap Sarcasm Keyboard.",
+                        symbol: "square.grid.2x2.fill"
                     )
                     stepRow(
                         number: 2,
