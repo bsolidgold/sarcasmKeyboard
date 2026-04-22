@@ -12,6 +12,13 @@ struct InstallGuideSheet: View {
             List {
                 Section {
                     Button {
+                        // NOTE: openSettingsURLString is supposed to deep-link to the
+                        // app's own Settings page, but on iOS 26 (and in our Simulator
+                        // testing) it lands at Settings root. We have a Settings.bundle
+                        // registered which is Apple's canonical requirement, but the
+                        // behavior doesn't match the docs. Copy below handles landing
+                        // at Settings root via Search. Revisit when testing on device
+                        // or if iOS behavior changes.
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
                         }
@@ -24,7 +31,7 @@ struct InstallGuideSheet: View {
                         }
                     }
                 } header: {
-                    Text("One tap, then three more inside Settings. Apple's rules.")
+                    Text("Apple won't let us flip the switch for you. Three taps inside Settings and you're done.")
                         .textCase(nil)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -33,21 +40,21 @@ struct InstallGuideSheet: View {
                 Section {
                     stepRow(
                         number: 1,
-                        title: "Tap Keyboards",
-                        detail: "You'll land on the Sarcasm Keyboard settings page.",
-                        symbol: "keyboard"
+                        title: "Search for Sarcasm",
+                        detail: "In Settings, tap the search bar at the top and type \"Sarcasm\". Tap Sarcasm Keyboard in the results.",
+                        symbol: "magnifyingglass"
                     )
                     stepRow(
                         number: 2,
-                        title: "Toggle it on",
-                        detail: "Flip the switch next to \"Sarcasm Keyboard\".",
-                        symbol: "switch.2"
+                        title: "Tap Keyboards",
+                        detail: "From the Sarcasm Keyboard page.",
+                        symbol: "keyboard"
                     )
                     stepRow(
                         number: 3,
-                        title: "Allow Full Access",
-                        detail: "Optional. Enables history and haptics. Nothing you type leaves your device.",
-                        symbol: "lock.shield.fill"
+                        title: "Toggle it on",
+                        detail: "Flip the switch next to \"Sarcasm Keyboard\". That's it.",
+                        symbol: "switch.2"
                     )
                 } header: {
                     Text("Inside Settings")
