@@ -9,6 +9,8 @@ struct ContentView: View {
     @State private var needsSetup: Bool = KeyboardStatus.shouldShowSetupBanner
     @State private var showInstallGuide = false
     @State private var proPatternToUpsell: AnyHashablePattern?
+    @State private var selectedThemeID: String = SharedDefaults.selectedThemeID
+    @State private var proThemeToUpsell: Theme?
     @State private var hasAutoPresentedGuide = false
 
     private var patterns: [any SarcasmPattern] { SarcasmEngine.allPatterns }
@@ -25,6 +27,7 @@ struct ContentView: View {
                 }
                 playgroundSection
                 patternsSection
+                themesSection
                 aboutSection
             }
             .listStyle(.plain)
@@ -49,6 +52,9 @@ struct ContentView: View {
             }
             .sheet(item: $proPatternToUpsell) { wrapper in
                 ProUpsellSheet(lockedPattern: wrapper.pattern)
+            }
+            .sheet(item: $proThemeToUpsell) { theme in
+                ProUpsellSheet(lockedTheme: theme)
             }
         }
         .tint(accent)
@@ -169,6 +175,26 @@ struct ContentView: View {
         }
     }
 
+    private var themesSection: some View {
+        Section {
+            ForEach(ThemeCatalog.allThemes) { theme in
+                Button {
+                    tapTheme(theme)
+                } label: {
+                    ThemeRow(
+                        theme: theme,
+                        isSelected: theme.id == selectedThemeID
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        } header: {
+            Text("Theme")
+        } footer: {
+            Text("Theme applies to the keyboard. Free themes work right away.")
+        }
+    }
+
     private var aboutSection: some View {
         Section {
             HStack {
@@ -181,6 +207,15 @@ struct ContentView: View {
         } header: {
             Text("About")
         }
+    }
+
+    private func tapTheme(_ theme: Theme) {
+        if theme.isPremium {
+            proThemeToUpsell = theme
+            return
+        }
+        selectedThemeID = theme.id
+        SharedDefaults.selectedThemeID = theme.id
     }
 
     private func tap(_ pattern: any SarcasmPattern) {
