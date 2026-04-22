@@ -9,6 +9,7 @@ struct KeyButton: View {
 
     let label: String
     let style: Style
+    let palette: Palette
     let action: () -> Void
 
     @State private var isPressed = false
@@ -17,15 +18,15 @@ struct KeyButton: View {
         Button(action: action) {
             Text(label)
                 .font(style == .letter ? .sarcasmMono : .sarcasmMonoSmall)
-                .foregroundColor(Palette.default.text)
+                .foregroundColor(palette.text)
                 .frame(maxWidth: .infinity)
                 .frame(height: 42)
                 .background(
                     ZStack {
                         RoundedRectangle(cornerRadius: 5, style: .continuous)
-                            .fill(isPressed ? Palette.default.accent.opacity(0.30) : backgroundColor)
+                            .fill(isPressed ? palette.accent.opacity(0.30) : backgroundColor)
                         VStack(spacing: 0) {
-                            Palette.default.topHighlight
+                            palette.topHighlight
                                 .frame(height: 1)
                             Color.clear
                         }
@@ -44,8 +45,8 @@ struct KeyButton: View {
 
     private var backgroundColor: Color {
         switch style {
-        case .letter: return Palette.default.keyFill
-        case .system: return Palette.default.systemKeyFill
+        case .letter: return palette.keyFill
+        case .system: return palette.systemKeyFill
         }
     }
 }

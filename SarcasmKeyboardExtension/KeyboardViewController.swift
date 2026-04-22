@@ -26,21 +26,22 @@ final class KeyboardViewController: UIInputViewController {
 
     private func makeKeyboardView() -> KeyboardView {
         KeyboardView(
-            onLetter: { [weak self] char in self?.handleLetter(char) },
-            onPunctuation: { [weak self] char in self?.handlePunctuation(char) },
-            onSpace: { [weak self] in self?.handleLetter(" ") },
-            onDelete: { [weak self] in self?.textDocumentProxy.deleteBackward() },
-            onReturn: { [weak self] in self?.textDocumentProxy.insertText("\n") },
-            onGlobe: { [weak self] in self?.advanceToNextInputMode() },
+            onLetter:       { [weak self] char in self?.handleLetter(char) },
+            onPunctuation:  { [weak self] char in self?.handlePunctuation(char) },
+            onSpace:        { [weak self] in self?.handleLetter(" ") },
+            onDelete:       { [weak self] in self?.textDocumentProxy.deleteBackward() },
+            onReturn:       { [weak self] in self?.textDocumentProxy.insertText("\n") },
+            onGlobe:        { [weak self] in self?.advanceToNextInputMode() },
             onCyclePattern: { [weak self] in self?.cyclePattern() },
-            currentPattern: SharedDefaults.selectedPattern
+            currentPattern: SharedDefaults.selectedPattern,
+            palette:        SharedDefaults.selectedTheme.palette
         )
     }
 
     private func handleLetter(_ char: Character) {
-        let prior = textDocumentProxy.documentContextBeforeInput ?? ""
+        let prior   = textDocumentProxy.documentContextBeforeInput ?? ""
         let pattern = SharedDefaults.selectedPattern
-        let out = pattern.transformCharacter(char, priorContext: prior)
+        let out     = pattern.transformCharacter(char, priorContext: prior)
         textDocumentProxy.insertText(out)
     }
 

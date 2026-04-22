@@ -10,6 +10,7 @@ struct KeyboardView: View {
     let onGlobe: () -> Void
     let onCyclePattern: () -> Void
     let currentPattern: any SarcasmPattern
+    let palette: Palette
 
     private let row1: [Character] = ["q","w","e","r","t","y","u","i","o","p"]
     private let row2: [Character] = ["a","s","d","f","g","h","j","k","l"]
@@ -17,10 +18,10 @@ struct KeyboardView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ActivePatternStrip(pattern: currentPattern, onTap: onCyclePattern)
+            ActivePatternStrip(pattern: currentPattern, palette: palette, onTap: onCyclePattern)
             keyRows
         }
-        .background(Palette.default.ink)
+        .background(palette.ink)
     }
 
     private var keyRows: some View {
@@ -30,20 +31,20 @@ struct KeyboardView: View {
                 .padding(.horizontal, 18)
             HStack(spacing: 6) {
                 ForEach(Array(row3), id: \.self) { c in
-                    KeyButton(label: String(c), style: .letter) { onLetter(c) }
+                    KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
                 }
-                KeyButton(label: "⌫", style: .system, action: onDelete)
+                KeyButton(label: "⌫", style: .system, palette: palette, action: onDelete)
                     .frame(width: 56)
             }
             HStack(spacing: 6) {
-                KeyButton(label: "🌐", style: .system, action: onGlobe)
+                KeyButton(label: "🌐", style: .system, palette: palette, action: onGlobe)
                     .frame(width: 44)
-                KeyButton(label: ".", style: .system) { onPunctuation(".") }
+                KeyButton(label: ".", style: .system, palette: palette) { onPunctuation(".") }
                     .frame(width: 40)
-                KeyButton(label: ",", style: .system) { onPunctuation(",") }
+                KeyButton(label: ",", style: .system, palette: palette) { onPunctuation(",") }
                     .frame(width: 40)
-                KeyButton(label: "space", style: .system, action: onSpace)
-                KeyButton(label: "return", style: .system, action: onReturn)
+                KeyButton(label: "space", style: .system, palette: palette, action: onSpace)
+                KeyButton(label: "return", style: .system, palette: palette, action: onReturn)
                     .frame(width: 80)
             }
         }
@@ -55,7 +56,7 @@ struct KeyboardView: View {
     private func letterRow(_ chars: [Character]) -> some View {
         HStack(spacing: 6) {
             ForEach(Array(chars), id: \.self) { c in
-                KeyButton(label: String(c), style: .letter) { onLetter(c) }
+                KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
             }
         }
     }
@@ -63,6 +64,7 @@ struct KeyboardView: View {
 
 private struct ActivePatternStrip: View {
     let pattern: any SarcasmPattern
+    let palette: Palette
     let onTap: () -> Void
 
     @State private var isPressed = false
@@ -72,24 +74,24 @@ private struct ActivePatternStrip: View {
             HStack(spacing: 6) {
                 Text("•")
                     .font(.sarcasmMonoSmall)
-                    .foregroundStyle(Palette.default.accent)
+                    .foregroundStyle(palette.accent)
                 Text(pattern.transform(pattern.displayName))
                     .font(.sarcasmMonoSmall)
-                    .foregroundStyle(Palette.default.accent)
+                    .foregroundStyle(palette.accent)
                 Text("▾")
                     .font(.sarcasmMonoSmall)
-                    .foregroundStyle(Palette.default.accent)
+                    .foregroundStyle(palette.accent)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 30)
             .background(
                 ZStack {
-                    Palette.default.ink
+                    palette.ink
                     if isPressed {
-                        Palette.default.accent.opacity(0.15)
+                        palette.accent.opacity(0.15)
                     }
                     VStack {
-                        Palette.default.accent.frame(height: 1)
+                        palette.accent.frame(height: 1)
                         Spacer()
                     }
                 }
