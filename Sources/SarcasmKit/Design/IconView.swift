@@ -14,25 +14,26 @@ public struct IconView: View {
 
     /// Renders the literal output of AlternatingPattern on "sarcastic",
     /// split into three rows of three — so the icon IS the product's output
-    /// on the product's name.
-    private static let rows: [String] = {
+    /// on the product's name. Per-row tracking compensates for the narrow
+    /// `tIc` row ('t'/'I'/'c' are all skinnier than 'sAr'/'CaS').
+    private static let rows: [(text: String, tracking: CGFloat)] = {
         let transformed = AlternatingPattern().transform("sarcastic")  // "sArCaStIc"
         return [
-            String(transformed.prefix(3)),
-            String(transformed.dropFirst(3).prefix(3)),
-            String(transformed.dropFirst(6).prefix(3))
+            (String(transformed.prefix(3)),                -24),
+            (String(transformed.dropFirst(3).prefix(3)),   -24),
+            (String(transformed.dropFirst(6).prefix(3)),    48)
         ]
     }()
 
     public var body: some View {
         ZStack {
             background
-            VStack(spacing: -110) {
-                ForEach(Self.rows, id: \.self) { row in
-                    Text(row)
+            VStack(spacing: -140) {
+                ForEach(Self.rows, id: \.text) { row in
+                    Text(row.text)
                         .font(.system(size: 400, weight: .black, design: .rounded))
                         .foregroundStyle(foreground)
-                        .tracking(-24)
+                        .tracking(row.tracking)
                 }
             }
         }
