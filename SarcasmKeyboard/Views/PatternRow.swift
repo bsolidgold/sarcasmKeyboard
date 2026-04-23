@@ -3,6 +3,7 @@ import SarcasmKit
 
 struct PatternRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(ProStore.self) private var store
     let pattern: any SarcasmPattern
     let isSelected: Bool
 
@@ -25,7 +26,7 @@ struct PatternRow: View {
                     Text(pattern.displayName)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.primary)
-                    if pattern.isPremium {
+                    if pattern.isPremium && !store.isPro {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(accent)

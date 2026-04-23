@@ -4,9 +4,11 @@ import SarcasmKit
 struct ProUpsellSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(ProStore.self) private var store
     private var accent: Color { Palette.default.accent(for: colorScheme) }
 
     private let lockedItemName: String
+    @State private var showError = false
 
     // MARK: Inits
 
@@ -59,21 +61,29 @@ struct ProUpsellSheet: View {
 
                     VStack(spacing: 10) {
                         Button {
-                            // StoreKit 2 wiring comes in Phase 6
+                            Task { await runPurchase() }
                         } label: {
-                            Text("Unlock for $2.99")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 6)
+                            ZStack {
+                                Text(unlockTitle)
+                                    .font(.headline)
+                                    .opacity(store.purchaseInFlight ? 0 : 1)
+                                if store.purchaseInFlight {
+                                    ProgressView()
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
+                        .disabled(store.purchaseInFlight || store.product == nil)
 
                         Button("Restore Purchase") {
-                            // StoreKit 2 wiring comes in Phase 6
+                            Task { await runRestore() }
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .disabled(store.purchaseInFlight)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 20)
@@ -86,6 +96,40 @@ struct ProUpsellSheet: View {
                     Button("Close") { dismiss() }
                 }
             }
+            .alert(
+                "Something went sideways",
+                isPresented: $showError,
+                presenting: store.lastError
+            ) { _ in
+                Button("OK", role: .cancel) { store.lastError = nil }
+            } message: { err in
+                Text(err)
+            }
+        }
+    }
+
+    private var unlockTitle: String {
+        if let price = store.product?.displayPrice {
+            return "Unlock for \(price)"
+        }
+        return "Unlock Pro"
+    }
+
+    private func runPurchase() async {
+        let ok = await store.purchase()
+        if ok {
+            dismiss()
+        } else if store.lastError != nil {
+            showError = true
+        }
+    }
+
+    private func runRestore() async {
+        let ok = await store.restore()
+        if ok {
+            dismiss()
+        } else if store.lastError != nil {
+            showError = true
         }
     }
 

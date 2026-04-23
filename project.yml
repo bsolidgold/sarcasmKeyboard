@@ -48,6 +48,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.sarcasmkeyboard.app
         CODE_SIGN_ENTITLEMENTS: SarcasmKeyboard/SarcasmKeyboard.entitlements
         TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      storeKitConfiguration: SarcasmKeyboard/Store/Products.storekit
 
   SarcasmKeyboardExtension:
     type: app-extension

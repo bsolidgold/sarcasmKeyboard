@@ -32,9 +32,28 @@ final class KeyboardViewController: UIInputViewController {
             onDelete:       { [weak self] in self?.textDocumentProxy.deleteBackward() },
             onReturn:       { [weak self] in self?.textDocumentProxy.insertText("\n") },
             onCyclePattern: { [weak self] in self?.cyclePattern() },
-            currentPattern: SharedDefaults.selectedPattern,
-            palette:        SharedDefaults.selectedTheme.palette
+            currentPattern: Self.resolvedPattern(),
+            palette:        Self.resolvedTheme().palette
         )
+    }
+
+    // If the user lost Pro (refund, family-sharing revoke) while a premium
+    // pattern/theme is still selected in SharedDefaults, fall back to a free
+    // default so the keyboard keeps working.
+    private static func resolvedPattern() -> any SarcasmPattern {
+        let p = SharedDefaults.selectedPattern
+        if p.isPremium && !SharedDefaults.isPro {
+            return AlternatingPattern()
+        }
+        return p
+    }
+
+    private static func resolvedTheme() -> Theme {
+        let t = SharedDefaults.selectedTheme
+        if t.isPremium && !SharedDefaults.isPro {
+            return ThemeCatalog.acid
+        }
+        return t
     }
 
     private func handleLetter(_ char: Character) {
@@ -51,7 +70,8 @@ final class KeyboardViewController: UIInputViewController {
     private func cyclePattern() {
         let nextID = PatternCycler.next(
             currentID: SharedDefaults.selectedPatternID,
-            in: SarcasmEngine.allPatterns
+            in: SarcasmEngine.allPatterns,
+            includePremium: SharedDefaults.isPro
         )
         SharedDefaults.selectedPatternID = nextID
         hostingController?.rootView = makeKeyboardView()

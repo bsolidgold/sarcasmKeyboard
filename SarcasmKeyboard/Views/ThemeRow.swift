@@ -3,6 +3,7 @@ import SarcasmKit
 
 struct ThemeRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(ProStore.self) private var store
     let theme: Theme
     let isSelected: Bool
 
@@ -26,7 +27,7 @@ struct ThemeRow: View {
                     Text(theme.displayName)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.primary)
-                    if theme.isPremium {
+                    if theme.isPremium && !store.isPro {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(accent)

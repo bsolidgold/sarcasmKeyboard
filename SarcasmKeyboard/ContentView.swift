@@ -4,6 +4,7 @@ import SarcasmKit
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(ProStore.self) private var store
     @State private var selectedPatternID: String = SharedDefaults.selectedPatternID
     @State private var playgroundInput: String = "the quick brown fox"
     @State private var needsSetup: Bool = KeyboardStatus.shouldShowSetupBanner
@@ -210,7 +211,7 @@ struct ContentView: View {
     }
 
     private func tapTheme(_ theme: Theme) {
-        if theme.isPremium {
+        if theme.isPremium && !store.isPro {
             proThemeToUpsell = theme
             return
         }
@@ -219,7 +220,7 @@ struct ContentView: View {
     }
 
     private func tap(_ pattern: any SarcasmPattern) {
-        if pattern.isPremium {
+        if pattern.isPremium && !store.isPro {
             proPatternToUpsell = AnyHashablePattern(pattern: pattern)
             return
         }
@@ -243,4 +244,5 @@ struct AnyHashablePattern: Identifiable, Hashable {
 
 #Preview {
     ContentView()
+        .environment(ProStore())
 }
