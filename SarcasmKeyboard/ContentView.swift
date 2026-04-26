@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var showInstallGuide = false
     @State private var proPatternToUpsell: AnyHashablePattern?
     @State private var selectedThemeID: String = SharedDefaults.selectedThemeID
+    @State private var recentHistory: [HistoryEntry] = []
     @State private var proThemeToUpsell: Theme?
     @State private var hasAutoPresentedGuide = false
 
@@ -27,6 +28,7 @@ struct ContentView: View {
                     setupSection
                 }
                 playgroundSection
+                historySection
                 patternsSection
                 themesSection
                 aboutSection
@@ -60,6 +62,7 @@ struct ContentView: View {
         }
         .tint(accent)
         .task {
+            refreshHistory()
             // On first appearance: if the keyboard isn't enabled yet, open the
             // install guide immediately so the user doesn't have to find the
             // setup banner. Only auto-presents once per app session.
@@ -74,6 +77,7 @@ struct ContentView: View {
             // enabled so the setup banner hides itself automatically.
             if phase == .active {
                 needsSetup = KeyboardStatus.shouldShowSetupBanner
+                refreshHistory()
             }
         }
     }
@@ -85,6 +89,10 @@ struct ContentView: View {
             selectedPatternID = next.id
         }
         SharedDefaults.selectedPatternID = next.id
+    }
+
+    private func refreshHistory() {
+        recentHistory = HistoryStore.load().reversed()
     }
 
     private var setupSection: some View {
@@ -153,6 +161,30 @@ struct ContentView: View {
             Text("Try it")
         } footer: {
             Text("Preview only — the keyboard transforms text as you type in any app.")
+        }
+    }
+
+    private var historySection: some View {
+        Section {
+            if recentHistory.isEmpty {
+                Text("Your transformed text shows up here once you start typing.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
+            } else {
+                ForEach(recentHistory.prefix(3)) { entry in
+                    HistoryRow(entry: entry)
+                }
+                NavigationLink {
+                    HistoryView()
+                } label: {
+                    Text("See all")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(accent)
+                }
+            }
+        } header: {
+            Text("Recent")
         }
     }
 
