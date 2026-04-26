@@ -28,6 +28,16 @@ public enum HistoryStore {
         save(entries)
     }
 
+    public static func delete(id: UUID) {
+        var entries = load()
+        entries.removeAll { $0.id == id }
+        save(entries)
+    }
+
+    public static func clear() {
+        SharedDefaults.defaults.removeObject(forKey: key)
+    }
+
     private static func save(_ entries: [HistoryEntry]) {
         guard let data = try? JSONEncoder().encode(entries) else { return }
         SharedDefaults.defaults.set(data, forKey: key)

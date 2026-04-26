@@ -40,4 +40,36 @@ final class HistoryStoreTests: XCTestCase {
         XCTAssertEqual(entries.first?.output, "entry1", "oldest should be evicted")
         XCTAssertEqual(entries.last?.output, "overflow", "newest should be at the end")
     }
+
+    func testDeleteRemovesOnlyMatchingEntry() {
+        let a = HistoryEntry(output: "a", patternID: "alternating")
+        let b = HistoryEntry(output: "b", patternID: "alternating")
+        let c = HistoryEntry(output: "c", patternID: "alternating")
+        HistoryStore.append(a)
+        HistoryStore.append(b)
+        HistoryStore.append(c)
+
+        HistoryStore.delete(id: b.id)
+
+        XCTAssertEqual(HistoryStore.load().map(\.output), ["a", "c"])
+    }
+
+    func testDeleteWithUnknownIDIsNoOp() {
+        let a = HistoryEntry(output: "a", patternID: "alternating")
+        HistoryStore.append(a)
+        HistoryStore.delete(id: UUID())
+        XCTAssertEqual(HistoryStore.load(), [a])
+    }
+
+    func testClearRemovesAll() {
+        HistoryStore.append(HistoryEntry(output: "x", patternID: "alternating"))
+        HistoryStore.append(HistoryEntry(output: "y", patternID: "alternating"))
+        HistoryStore.clear()
+        XCTAssertEqual(HistoryStore.load(), [])
+    }
+
+    func testLoadReturnsEmptyOnCorruptData() {
+        SharedDefaults.defaults.set(Data("not valid json".utf8), forKey: HistoryStore.key)
+        XCTAssertEqual(HistoryStore.load(), [])
+    }
 }
