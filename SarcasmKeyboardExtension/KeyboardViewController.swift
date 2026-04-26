@@ -4,10 +4,12 @@ import SarcasmKit
 
 final class KeyboardViewController: UIInputViewController {
     private var hostingController: UIHostingController<KeyboardView>?
+    private var historySession: HistorySession?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         KeyboardStatus.recordHeartbeat()
+        historySession = HistorySession(write: HistoryStore.append)
 
         let host = UIHostingController(rootView: makeKeyboardView())
         host.view.translatesAutoresizingMaskIntoConstraints = false
@@ -24,13 +26,18 @@ final class KeyboardViewController: UIInputViewController {
         hostingController = host
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        flushHistory()
+    }
+
     private func makeKeyboardView() -> KeyboardView {
         KeyboardView(
             onLetter:       { [weak self] char in self?.handleLetter(char) },
             onPunctuation:  { [weak self] char in self?.handlePunctuation(char) },
             onSpace:        { [weak self] in self?.handleLetter(" ") },
-            onDelete:       { [weak self] in self?.textDocumentProxy.deleteBackward() },
-            onReturn:       { [weak self] in self?.textDocumentProxy.insertText("\n") },
+            onDelete:       { [weak self] in self?.handleDelete() },
+            onReturn:       { [weak self] in self?.handleReturn() },
             onCyclePattern: { [weak self] in self?.cyclePattern() },
             currentPattern: Self.resolvedPattern(),
             palette:        Self.resolvedTheme().palette
@@ -61,10 +68,27 @@ final class KeyboardViewController: UIInputViewController {
         let pattern = SharedDefaults.selectedPattern
         let out     = pattern.transformCharacter(char, priorContext: prior)
         textDocumentProxy.insertText(out)
+        historySession?.append(out)
     }
 
     private func handlePunctuation(_ char: Character) {
-        textDocumentProxy.insertText(String(char))
+        let s = String(char)
+        textDocumentProxy.insertText(s)
+        historySession?.append(s)
+    }
+
+    private func handleDelete() {
+        textDocumentProxy.deleteBackward()
+        historySession?.removeLast()
+    }
+
+    private func handleReturn() {
+        textDocumentProxy.insertText("\n")
+        flushHistory()
+    }
+
+    private func flushHistory() {
+        historySession?.flush(currentPatternID: SharedDefaults.selectedPatternID)
     }
 
     private func cyclePattern() {
