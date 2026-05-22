@@ -42,6 +42,7 @@ struct HomeView: View {
             .padding(.top, 8)
             .padding(.bottom, 40)
         }
+        .background(Color(.systemBackground))
         .navigationTitle(currentPattern.transform("Sarcasm Keyboard"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
