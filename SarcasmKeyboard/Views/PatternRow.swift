@@ -49,8 +49,11 @@ struct PatternRow: View {
         case "spongebob": return "face.smiling"
         case "random": return "dice"
         case "wordToggle": return "textformat"
+        case "uwu": return "pawprint.fill"
+        case "bubble": return "circle.circle"
         case "smallCaps": return "textformat.size.smaller"
         case "zalgo": return "sparkles"
+        case "upsidedown": return "arrow.up.and.down.and.arrow.left.and.right"
         default: return "character"
         }
     }

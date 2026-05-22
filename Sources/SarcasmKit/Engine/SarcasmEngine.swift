@@ -6,8 +6,11 @@ public enum SarcasmEngine {
         SpongeBobPattern(),
         RandomPattern(),
         WordTogglePattern(),
+        UwuPattern(),
+        BubblePattern(),
         SmallCapsPattern(),
-        ZalgoPattern()
+        ZalgoPattern(),
+        UpsideDownPattern()
     ]
 
     public static func pattern(id: String) -> (any SarcasmPattern)? {
