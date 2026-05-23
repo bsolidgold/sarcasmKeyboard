@@ -78,6 +78,6 @@ final class BubblePatternTests: XCTestCase {
 
     func testMetadata() {
         XCTAssertEqual(pattern.id, "bubble")
-        XCTAssertFalse(pattern.isPremium)
+        XCTAssertTrue(pattern.isPremium)
     }
 }

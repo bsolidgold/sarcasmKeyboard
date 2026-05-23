@@ -11,6 +11,7 @@ public enum SharedDefaults {
         static let selectedPatternID = "sarcasm.selectedPatternID"
         static let selectedThemeID   = "sarcasm.selectedThemeID"
         static let isPro             = "sarcasm.isPro"
+        static let isDarkMode        = "sarcasm.isDarkMode"
     }
 
     // MARK: Pattern
@@ -27,12 +28,19 @@ public enum SharedDefaults {
     // MARK: Theme
 
     public static var selectedThemeID: String {
-        get { defaults.string(forKey: Keys.selectedThemeID) ?? ThemeCatalog.acid.id }
+        get { defaults.string(forKey: Keys.selectedThemeID) ?? ThemeCatalog.cleanLight.id }
         set { defaults.setValue(newValue, forKey: Keys.selectedThemeID) }
     }
 
     public static var selectedTheme: Theme {
         ThemeCatalog.theme(id: selectedThemeID) ?? ThemeCatalog.acid
+    }
+
+    // MARK: Dark mode (Pro feature)
+
+    public static var isDarkMode: Bool {
+        get { defaults.bool(forKey: Keys.isDarkMode) }
+        set { defaults.setValue(newValue, forKey: Keys.isDarkMode) }
     }
 
     // MARK: Pro entitlement

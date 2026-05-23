@@ -28,9 +28,9 @@ final class SharedDefaultsTests: XCTestCase {
 
     // MARK: selectedThemeID
 
-    func testSelectedThemeIDDefaultsToAcid() {
+    func testSelectedThemeIDDefaultsToCleanLight() {
         SharedDefaults.defaults.removeObject(forKey: "sarcasm.selectedThemeID")
-        XCTAssertEqual(SharedDefaults.selectedThemeID, "acid")
+        XCTAssertEqual(SharedDefaults.selectedThemeID, "cleanLight")
     }
 
     func testSelectedThemeIDRoundTrip() {

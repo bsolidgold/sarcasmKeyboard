@@ -14,16 +14,16 @@ public struct Theme: Sendable, Equatable, Identifiable {
 public enum ThemeCatalog {
 
     public static let allThemes: [Theme] = [
-        acid,        // free
-        cleanLight,  // free
-        cleanDark,   // free
-        neon,        // Pro
-        vaporwave,   // Pro
+        cleanLight,    // free — default
+        acid,          // free
+        cleanDark,     // free
+        neon,          // Pro
+        vaporwave,     // Pro
         terminalGreen, // Pro
-        sunset,      // Pro
-        paper,       // Pro
-        y2k,         // Pro
-        highlighter, // Pro
+        sunset,        // Pro
+        paper,         // Pro
+        y2k,           // Pro
+        highlighter,   // Pro
     ]
 
     public static func theme(id: String) -> Theme? {

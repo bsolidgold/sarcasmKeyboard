@@ -58,33 +58,37 @@ final class KeyboardViewController: UIInputViewController {
     private static func resolvedTheme() -> Theme {
         let t = SharedDefaults.selectedTheme
         if t.isPremium && !SharedDefaults.isPro {
-            return ThemeCatalog.acid
+            return ThemeCatalog.cleanLight
         }
         return t
     }
 
     private func handleLetter(_ char: Character) {
         let prior   = textDocumentProxy.documentContextBeforeInput ?? ""
-        let pattern = SharedDefaults.selectedPattern
+        let pattern = Self.resolvedPattern()
         let out     = pattern.transformCharacter(char, priorContext: prior)
         textDocumentProxy.insertText(out)
         historySession?.append(out)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func handlePunctuation(_ char: Character) {
         let s = String(char)
         textDocumentProxy.insertText(s)
         historySession?.append(s)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func handleDelete() {
         textDocumentProxy.deleteBackward()
         historySession?.removeLast()
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
     }
 
     private func handleReturn() {
         textDocumentProxy.insertText("\n")
         flushHistory()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private func flushHistory() {

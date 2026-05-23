@@ -3,7 +3,7 @@ import Foundation
 public struct BubblePattern: SarcasmPattern {
     public let id = "bubble"
     public let displayName = "Ⓑⓤⓑⓑⓛⓔ"
-    public let isPremium = false
+    public let isPremium = true
 
     public init() {}
 

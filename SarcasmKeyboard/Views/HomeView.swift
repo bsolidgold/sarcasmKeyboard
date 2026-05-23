@@ -14,14 +14,22 @@ struct HomeView: View {
     @State private var showInstallGuide = false
     @State private var proPatternToUpsell: AnyHashablePattern?
     @State private var proThemeToUpsell: Theme?
+    @State private var showDarkModeUpsell = false
     @State private var hasAutoPresentedGuide = false
     @State private var copiedOutput = false
+
+    private var accent: Color {
+        colorScheme == .dark ? Color(hex: 0xB5F050) : Color(hex: 0x3F7A00)
+    }
+
 
     private var patterns: [any SarcasmPattern] { SarcasmEngine.allPatterns }
     private var currentPattern: any SarcasmPattern {
         SarcasmEngine.pattern(id: selectedPatternID) ?? AlternatingPattern()
     }
-    private var accent: Color { Palette.default.accent(for: colorScheme) }
+    private var selectedTheme: Theme {
+        ThemeCatalog.theme(id: selectedThemeID) ?? ThemeCatalog.cleanLight
+    }
     private var transformedOutput: String {
         let input = playgroundInput.trimmingCharacters(in: .whitespaces)
         return currentPattern.transform(input.isEmpty ? "type something" : input)
@@ -30,37 +38,29 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                headerSection
                 if needsSetup {
-                    setupBanner
-                        .padding(.horizontal, 16)
+                    setupBanner.padding(.horizontal, 16)
                 }
-                playgroundCard
-                    .padding(.horizontal, 16)
+                playgroundCard.padding(.horizontal, 16)
                 patternSection
                 themeSection
             }
             .padding(.top, 8)
             .padding(.bottom, 40)
         }
-        .background(Color(.systemBackground))
-        .navigationTitle(currentPattern.transform("Sarcasm Keyboard"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button { rerollPattern() } label: {
-                    Image(systemName: "sparkles")
-                        .symbolEffect(.bounce, value: selectedPatternID)
-                }
-                .accessibilityLabel("Shuffle pattern")
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $showInstallGuide) { InstallGuideSheet() }
         .sheet(item: $proPatternToUpsell) { ProUpsellSheet(lockedPattern: $0.pattern) }
         .sheet(item: $proThemeToUpsell) { ProUpsellSheet(lockedTheme: $0) }
+        .sheet(isPresented: $showDarkModeUpsell) { ProUpsellSheet(featureName: "Dark Mode") }
         .tint(accent)
         .task {
             guard !hasAutoPresentedGuide else { return }
             hasAutoPresentedGuide = true
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--no-install-guide") { return }
+            #endif
             if KeyboardStatus.shouldShowSetupBanner {
                 showInstallGuide = true
             }
@@ -72,6 +72,41 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Header
+
+    private var headerSection: some View {
+        HStack(alignment: .center) {
+            Text("sArCaSm")
+                .font(.system(size: 34, weight: .bold, design: .monospaced))
+                .foregroundStyle(accent)
+                .lineLimit(1)
+            Spacer(minLength: 8)
+            // Dark mode toggle
+            Button { toggleDarkMode() } label: {
+                Image(systemName: store.isDarkMode ? "moon.fill" : "moon")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(accent)
+                    .frame(width: 36, height: 36)
+                    .background(accent.opacity(0.12), in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(store.isDarkMode ? "Switch to light mode" : "Switch to dark mode")
+            // Shuffle pattern
+            Button { rerollPattern() } label: {
+                Image(systemName: "sparkles")
+                    .symbolEffect(.bounce, value: selectedPatternID)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(accent)
+                    .frame(width: 36, height: 36)
+                    .background(accent.opacity(0.12), in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Shuffle pattern")
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+    }
+
     // MARK: - Setup Banner
 
     private var setupBanner: some View {
@@ -80,8 +115,11 @@ struct HomeView: View {
                 Image(systemName: "keyboard.badge.ellipsis")
                     .font(.title3)
                     .foregroundStyle(accent)
-                    .frame(width: 40, height: 40)
-                    .background(accent.opacity(0.15), in: Circle())
+                    .frame(width: 36, height: 36)
+                    .background(
+                        Circle()
+                            .fill(accent.opacity(0.2))
+                    )
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Install the keyboard")
                         .font(.subheadline.weight(.semibold))
@@ -96,7 +134,14 @@ struct HomeView: View {
                     .foregroundStyle(.tertiary)
             }
             .padding(14)
-            .background(accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(accent.opacity(0.12))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(accent.opacity(0.25), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
         .overlay(alignment: .topTrailing) {
@@ -118,60 +163,83 @@ struct HomeView: View {
 
     // MARK: - Playground Card
 
-    private static let cardGreen = Color(red: 0.722, green: 1.0, blue: 0.165)
-
     private var playgroundCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        let p = selectedTheme.palette
+        return VStack(alignment: .leading, spacing: 0) {
+            // "PREVIEW" label
+            Text("PREVIEW")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .tracking(1)
+                .foregroundStyle(p.accent.opacity(0.7))
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+
+            // Input field
             TextField("Type something...", text: $playgroundInput, axis: .vertical)
                 .font(.body)
                 .lineLimit(1...3)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .foregroundStyle(Color.white.opacity(0.75))
-                .tint(Self.cardGreen)
-                .padding(.horizontal, 20)
-                .padding(.top, 18)
-                .padding(.bottom, 14)
-
-            Divider()
-                .overlay(Color.white.opacity(0.1))
-                .padding(.horizontal, 20)
-
-            Text(transformedOutput)
-                .font(.sarcasmMono)
-                .foregroundStyle(Self.cardGreen)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
-                .minimumScaleFactor(0.65)
-                .lineLimit(4)
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
+                .foregroundStyle(p.text.opacity(0.6))
+                .tint(p.accent)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(p.keyFill)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(p.topHighlight.opacity(0.5), lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
                 .padding(.bottom, 12)
 
-            HStack {
-                Text(currentPattern.displayName.uppercased())
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.white.opacity(0.35))
-                    .tracking(1)
-                Spacer(minLength: 0)
-                Button { copyOutput() } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: copiedOutput ? "checkmark" : "doc.on.doc")
-                            .contentTransition(.symbolEffect(.replace))
-                        Text(copiedOutput ? "Copied" : "Copy")
-                    }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(copiedOutput ? Color.white.opacity(0.5) : Self.cardGreen)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 16)
+            // Output text
+            Text(transformedOutput)
+                .font(.system(size: 22, weight: .bold, design: .monospaced))
+                .foregroundStyle(p.accent)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+                .minimumScaleFactor(0.6)
+                .lineLimit(3)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 48)
+
         }
-        .background(Color.black, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(alignment: .bottomTrailing) {
+            Button { copyOutput() } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: copiedOutput ? "checkmark" : "doc.on.doc")
+                        .contentTransition(.symbolEffect(.replace))
+                    Text(copiedOutput ? "Copied" : "Copy")
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(copiedOutput ? p.accent.opacity(0.5) : p.accent)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(p.accent.opacity(0.15)))
+                .overlay(Capsule().strokeBorder(p.accent.opacity(0.35), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .padding(14)
+        }
+        .padding(.bottom, 4)
+        .background {
+            ZStack {
+                p.ink
+                RadialGradient(
+                    colors: [p.accent.opacity(0.15), .clear],
+                    center: .topTrailing,
+                    startRadius: 0,
+                    endRadius: 100
+                )
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(p.accent.opacity(0.25), lineWidth: 1)
         )
     }
 
@@ -225,6 +293,14 @@ struct HomeView: View {
 
     // MARK: - Actions
 
+    private func toggleDarkMode() {
+        guard store.isPro else {
+            showDarkModeUpsell = true
+            return
+        }
+        withAnimation(.bouncy) { store.isDarkMode.toggle() }
+    }
+
     private func rerollPattern() {
         let free = patterns.filter { !$0.isPremium && $0.id != selectedPatternID }
         guard let next = free.randomElement() else { return }
@@ -237,6 +313,7 @@ struct HomeView: View {
             proPatternToUpsell = AnyHashablePattern(pattern: pattern)
             return
         }
+        UISelectionFeedbackGenerator().selectionChanged()
         withAnimation(.bouncy) { selectedPatternID = pattern.id }
         SharedDefaults.selectedPatternID = pattern.id
     }
@@ -246,6 +323,7 @@ struct HomeView: View {
             proThemeToUpsell = theme
             return
         }
+        UISelectionFeedbackGenerator().selectionChanged()
         withAnimation(.bouncy) { selectedThemeID = theme.id }
         SharedDefaults.selectedThemeID = theme.id
     }
@@ -272,35 +350,35 @@ private struct PatternCard: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
+                // Transformed preview first (top), like the mockup
+                Text(pattern.transform("Hello World"))
+                    .font(.sarcasmMonoSmall)
+                    .foregroundStyle(isSelected ? accent : .secondary)
+                    .lineLimit(1)
+                HStack(alignment: .bottom, spacing: 4) {
                     Text(pattern.displayName)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(isSelected ? accent : .primary)
                         .lineLimit(1)
                     if pattern.isPremium && !isPro {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.system(size: 9, weight: .semibold))
                             .foregroundStyle(isSelected ? accent : .secondary)
-                            .padding(.top, 2)
+                            .padding(.bottom, 1)
                     }
                     Spacer(minLength: 0)
                 }
-                Text(pattern.transform("Hello World"))
-                    .font(.sarcasmMonoSmall)
-                    .foregroundStyle(isSelected ? accent.opacity(0.8) : .secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(14)
-            .frame(width: 150, alignment: .leading)
+            .frame(width: 140, alignment: .leading)
             .background(
                 isSelected ? accent.opacity(0.12) : Color(.secondarySystemBackground),
-                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(isSelected ? accent.opacity(0.5) : Color.clear, lineWidth: 1.5)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(isSelected ? accent.opacity(0.4) : Color(.separator).opacity(0.3), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -318,17 +396,17 @@ private struct ThemeSwatch: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 ZStack(alignment: .topTrailing) {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    // Swatch: full theme ink color with accent stripe at bottom
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(theme.palette.ink)
-                        .frame(width: 80, height: 52)
-                        .overlay {
-                            HStack(spacing: 4) {
-                                keyMock("A", fg: theme.palette.text, bg: theme.palette.keyFill)
-                                keyMock("b", fg: theme.palette.accent, bg: theme.palette.keyFill)
-                                keyMock("C", fg: theme.palette.text, bg: theme.palette.keyFill)
-                            }
+                        .frame(width: 80, height: 56)
+                        .overlay(alignment: .bottomLeading) {
+                            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                .fill(theme.palette.accent)
+                                .frame(width: 44, height: 8)
+                                .padding(8)
                         }
                     if theme.isPremium && !isPro {
                         Image(systemName: "lock.fill")
@@ -339,9 +417,9 @@ private struct ThemeSwatch: View {
                             .padding(5)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .strokeBorder(
                             isSelected ? accent : Color(.separator).opacity(0.4),
                             lineWidth: isSelected ? 2 : 0.5
@@ -355,17 +433,6 @@ private struct ThemeSwatch: View {
             }
         }
         .buttonStyle(.plain)
-    }
-
-    private func keyMock(_ label: String, fg: Color, bg: Color) -> some View {
-        RoundedRectangle(cornerRadius: 4, style: .continuous)
-            .fill(bg)
-            .frame(width: 20, height: 24)
-            .overlay {
-                Text(label)
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .foregroundStyle(fg)
-            }
     }
 }
 

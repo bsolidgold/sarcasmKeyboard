@@ -102,7 +102,7 @@ struct HistoryView: View {
 
     private func copy(_ entry: HistoryEntry) {
         UIPasteboard.general.string = entry.output
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation(.easeInOut(duration: 0.2)) {
             showCopiedToast = true
         }
@@ -115,6 +115,7 @@ struct HistoryView: View {
     }
 
     private func delete(_ entry: HistoryEntry) {
+        UINotificationFeedbackGenerator().notificationOccurred(.warning)
         HistoryStore.delete(id: entry.id)
         refresh()
     }

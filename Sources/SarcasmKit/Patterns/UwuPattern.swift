@@ -3,7 +3,7 @@ import Foundation
 public struct UwuPattern: SarcasmPattern {
     public let id = "uwu"
     public let displayName = "UwU"
-    public let isPremium = false
+    public let isPremium = true
 
     public init() {}
 

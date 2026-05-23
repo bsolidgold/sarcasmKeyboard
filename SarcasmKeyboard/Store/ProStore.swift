@@ -12,6 +12,12 @@ final class ProStore {
     private(set) var purchaseInFlight: Bool = false
     var lastError: String?
 
+    private var _isDarkMode: Bool = SharedDefaults.isDarkMode
+    var isDarkMode: Bool {
+        get { _isDarkMode }
+        set { _isDarkMode = newValue; SharedDefaults.isDarkMode = newValue }
+    }
+
     init() {
         // ProStore is app-lifetime (owned by @main via @State), so we start
         // a long-running listener and don't bother canceling. Weak self
@@ -96,6 +102,12 @@ final class ProStore {
         guard case .verified(let tx) = result, tx.productID == Self.productID else { return }
         await tx.finish()
         await refreshEntitlement()
+    }
+
+    func redeemPromoCode(_ code: String) -> PromoCodeValidator.Result {
+        let result = PromoCodeValidator.redeem(code, isPro: isPro)
+        if result == .valid { setPro(true) }
+        return result
     }
 
     private func setPro(_ value: Bool) {

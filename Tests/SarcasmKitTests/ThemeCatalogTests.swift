@@ -13,7 +13,7 @@ final class ThemeCatalogTests: XCTestCase {
     func testThemeOrder() {
         let ids = ThemeCatalog.allThemes.map(\.id)
         XCTAssertEqual(ids, [
-            "acid", "cleanLight", "cleanDark",
+            "cleanLight", "acid", "cleanDark",
             "neon", "vaporwave", "terminalGreen",
             "sunset", "paper", "y2k", "highlighter"
         ])

@@ -89,6 +89,6 @@ final class UwuPatternTests: XCTestCase {
 
     func testMetadata() {
         XCTAssertEqual(pattern.id, "uwu")
-        XCTAssertFalse(pattern.isPremium)
+        XCTAssertTrue(pattern.isPremium)
     }
 }

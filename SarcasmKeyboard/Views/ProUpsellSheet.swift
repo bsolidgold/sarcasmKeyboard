@@ -9,6 +9,10 @@ struct ProUpsellSheet: View {
 
     private let lockedItemName: String
     @State private var showError = false
+    @State private var promoCode = ""
+    @State private var promoState: PromoState = .idle
+
+    private enum PromoState { case idle, valid, invalid }
 
     // MARK: Inits
 
@@ -18,6 +22,10 @@ struct ProUpsellSheet: View {
 
     init(lockedTheme: Theme) {
         self.lockedItemName = lockedTheme.displayName
+    }
+
+    init(featureName: String) {
+        self.lockedItemName = featureName
     }
 
     // MARK: Body
@@ -84,6 +92,8 @@ struct ProUpsellSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .disabled(store.purchaseInFlight)
+
+                        promoSection
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 20)
@@ -130,6 +140,66 @@ struct ProUpsellSheet: View {
             dismiss()
         } else if store.lastError != nil {
             showError = true
+        }
+    }
+
+    private var promoSection: some View {
+        VStack(spacing: 8) {
+            Text("have a code?")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+
+            HStack(spacing: 8) {
+                TextField("", text: $promoCode)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .font(.system(.body, design: .monospaced))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(promoFieldBorderColor, lineWidth: 1.5)
+                            .background(Color(.secondarySystemBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous)))
+                    )
+                    .onChange(of: promoCode) { promoState = .idle }
+
+                Button("Apply") { applyPromoCode() }
+                    .buttonStyle(.bordered)
+                    .disabled(promoCode.trimmingCharacters(in: .whitespaces).isEmpty
+                              || promoState == .valid)
+            }
+
+            if promoState == .valid {
+                Label("Code accepted — welcome to Pro", systemImage: "checkmark.circle.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.green)
+            } else if promoState == .invalid {
+                Label("Invalid code — double-check and try again", systemImage: "xmark.circle.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.red)
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    private var promoFieldBorderColor: Color {
+        switch promoState {
+        case .valid:   return .green
+        case .invalid: return .red
+        case .idle:    return Color(.separator)
+        }
+    }
+
+    private func applyPromoCode() {
+        switch store.redeemPromoCode(promoCode) {
+        case .valid:
+            promoState = .valid
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { dismiss() }
+        case .invalid:
+            promoState = .invalid
+        case .alreadyPro:
+            dismiss()
         }
     }
 

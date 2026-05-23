@@ -10,9 +10,9 @@ final class PatternCyclerTests: XCTestCase {
 
     func testSkipsPremiumPatterns() {
         let patterns = SarcasmEngine.allPatterns
-        // wordToggle is free; next free after wordToggle is uwu (bubble follows, then premium patterns)
+        // wordToggle is the last free pattern; next free wraps back to alternating
         let next = PatternCycler.next(currentID: "wordToggle", in: patterns)
-        XCTAssertEqual(next, "uwu")
+        XCTAssertEqual(next, "alternating")
     }
 
     func testWrapsAtEndOfFreeList() {

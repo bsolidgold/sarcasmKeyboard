@@ -5,6 +5,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(ProStore.self) private var store
     @State private var showInstallGuide = false
+    @State private var showDarkModeUpsell = false
     @State private var showError = false
 
     private var accent: Color { Palette.default.accent(for: colorScheme) }
@@ -17,12 +18,14 @@ struct SettingsView: View {
             if !store.isPro {
                 proSection
             }
+            appearanceSection
             keyboardSection
             aboutSection
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showInstallGuide) { InstallGuideSheet() }
+        .sheet(isPresented: $showDarkModeUpsell) { ProUpsellSheet(featureName: "Dark Mode") }
         .alert(
             "Something went sideways",
             isPresented: $showError,
@@ -85,6 +88,48 @@ struct SettingsView: View {
                 .disabled(store.purchaseInFlight)
             }
             .padding(.vertical, 6)
+        }
+    }
+
+    // MARK: - Appearance Section
+
+    private var appearanceSection: some View {
+        Section("Appearance") {
+            Button {
+                if store.isPro {
+                    withAnimation(.bouncy) { store.isDarkMode.toggle() }
+                } else {
+                    showDarkModeUpsell = true
+                }
+            } label: {
+                HStack {
+                    Label(
+                        store.isDarkMode ? "Dark Mode" : "Light Mode",
+                        systemImage: store.isDarkMode ? "moon.fill" : "moon"
+                    )
+                    .foregroundStyle(.primary)
+                    Spacer()
+                    if store.isPro {
+                        Toggle("", isOn: Binding(
+                            get: { store.isDarkMode },
+                            set: { newValue in
+                                withAnimation(.bouncy) { store.isDarkMode = newValue }
+                            }
+                        ))
+                        .labelsHidden()
+                        .tint(accent)
+                    } else {
+                        HStack(spacing: 4) {
+                            Text("Pro")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(accent)
+                            Image(systemName: "lock.fill")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Sarcasm Keyboard</title>
+  <meta name="description" content="Sarcasm Keyboard's privacy policy. We definitely collect your sarcasm levels. Among other things we totally made up.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #b5f050;
+      --ink: #0a0a0a;
+      --surface: #141414;
+      --border: rgba(255,255,255,0.08);
+      --text: #f2f2f7;
+      --subtle: rgba(255,255,255,0.45);
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10,10,10,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'SF Mono', 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    nav a.nav-link {
+      color: var(--subtle);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a.nav-link:hover { color: var(--text); }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+
+    .page-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--subtle);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .last-updated {
+      font-size: 13px;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 52px;
+      padding-bottom: 32px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    /* TL;DR */
+    .tldr {
+      background: linear-gradient(135deg, rgba(181,240,80,0.1) 0%, rgba(181,240,80,0.04) 100%);
+      border: 1px solid rgba(181,240,80,0.2);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 130px; height: 130px;
+      background: radial-gradient(circle, rgba(181,240,80,0.18) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .tldr-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(181,240,80,0.6);
+      margin-bottom: 10px;
+    }
+
+    .tldr h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
+
+    .tldr p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+
+    /* Policy sections */
+    .policy-section {
+      margin-bottom: 52px;
+    }
+
+    .policy-section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 0.5px solid var(--border);
+      line-height: 1.3;
+    }
+
+    .policy-section p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .policy-section p:last-child { margin-bottom: 0; }
+
+    .policy-section p strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Data collection cards */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .data-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .data-card .data-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .data-card .data-desc {
+      font-size: 13px;
+      color: var(--subtle);
+      line-height: 1.55;
+    }
+
+    .data-card .data-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(181,240,80,0.1);
+      border: 1px solid rgba(181,240,80,0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-bottom: 10px;
+    }
+
+    /* The "actually" callout */
+    .actually {
+      background: rgba(181,240,80,0.07);
+      border: 1px solid rgba(181,240,80,0.18);
+      border-left: 3px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .actually p {
+      font-size: 14px;
+      color: rgba(181,240,80,0.9);
+      margin: 0 !important;
+      line-height: 1.6;
+    }
+
+    .actually p strong {
+      color: var(--green) !important;
+    }
+
+    /* Strike list */
+    .strike-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0 24px;
+    }
+
+    .strike-list li {
+      font-size: 15px;
+      color: rgba(255,255,255,0.35);
+      text-decoration: line-through;
+      text-decoration-color: rgba(181,240,80,0.4);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .strike-list li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      color: rgba(181,240,80,0.4);
+      font-size: 12px;
+      top: 3px;
+    }
+
+    /* Contact form */
+    .contact-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .contact-form label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--subtle);
+      margin-bottom: 6px;
+      margin-top: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .contact-form label:first-child { margin-top: 0; }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: var(--green);
+    }
+
+    .contact-form textarea { min-height: 120px; resize: vertical; }
+
+    .contact-form button {
+      margin-top: 20px;
+      background: var(--green);
+      color: #0a0f0a;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .contact-form button:hover { opacity: 0.85; }
+    .contact-form button:disabled { opacity: 0.5; cursor: default; }
+
+    .contact-form .form-status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--green);
+      display: none;
+    }
+
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--subtle);
+    }
+
+    footer a {
+      color: var(--subtle);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">sArCaSm</a>
+    <a href="/" class="nav-link">← bAcK tO hOmE</a>
+  </nav>
+
+  <div class="container">
+
+    <p class="page-eyebrow">Legal</p>
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">A document you'll actually read because it doesn't take itself seriously.</p>
+    <p class="last-updated">Last updated: May 2025 &nbsp;·&nbsp; Effective immediately, whether you like it or not</p>
+
+    <!-- TL;DR -->
+    <div class="tldr">
+      <div class="tldr-label">tHeY aCtUaLlY rEaD tHe TlDr</div>
+      <h2>We collect absolutely nothing about you.<br>Like, genuinely nothing.</h2>
+      <p>No data. No tracking. No servers. No idea who you are. We couldn't pick you out of a lineup if we tried. This entire document exists because Apple requires it — and because we thought it'd be funnier than the alternative.</p>
+    </div>
+
+    <!-- What we collect (the funny section) -->
+    <div class="policy-section">
+      <h2>1. The Data We Collect (an incomplete list)</h2>
+
+      <p>We take data collection very seriously. Extremely seriously. We have <em>spreadsheets</em>. Below is everything we know about you:</p>
+
+      <div class="data-grid">
+
+        <div class="data-card">
+          <span class="data-tag">Behavioral</span>
+          <div class="data-title">Your Daily Sarcasm Index (DSI)</div>
+          <div class="data-desc">A rolling 24-hour score of how sarcastic you are. Peaks on Monday mornings and whenever someone says "per my last email." Expressed in units of eye rolls per hour.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Social</span>
+          <div class="data-title">Cookout Eligibility Score</div>
+          <div class="data-desc">Proprietary algorithm. Factors include: do you bring the potato salad or show up with a store-bought bag of chips? We share this with exactly zero parties, because it's personal.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Psychographic</span>
+          <div class="data-title">Passive-Aggression Ratio</div>
+          <div class="data-desc">Your ratio of passive-aggressive to regular-aggressive text. If it's over 4:1, we're concerned but not surprised. "No worries!" sent at 11pm tells us everything.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Clinical</span>
+          <div class="data-title">Fine-ness Assessment</div>
+          <div class="data-desc">The number of times you've typed "I'm fine" when you are, by any objective measure, not fine. We are tracking this for your own good. You're not fooling anyone.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Predictive</span>
+          <div class="data-title">Almost-Texted-Your-Ex Index</div>
+          <div class="data-desc">How many times you opened a conversation, started typing, and then thought better of it. We're proud of you. We don't store this. We just want you to know we noticed.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Culinary</span>
+          <div class="data-title">Brunch Enthusiasm Level</div>
+          <div class="data-desc">Scale of 1–10. Measured by how often you type "brunch?" versus how often you type "ugh, people." Calibrated seasonally. Higher in spring. Obviously.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Linguistic</span>
+          <div class="data-title">Ironic lol Usage Rate</div>
+          <div class="data-desc">Whether your "lol" means you actually laughed, or you typed it instead of screaming into a pillow. There is a difference. We know the difference. Do you?</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Interpersonal</span>
+          <div class="data-title">Beef Inventory</div>
+          <div class="data-desc">A list of people you're currently beefing with, inferred from your typing speed and pattern intensity. Stored securely. Not shared. Not judged. (Lightly judged.)</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Occupational</span>
+          <div class="data-title">Meeting Survival Rate</div>
+          <div class="data-desc">The percentage of meetings that "could have been an email," calculated from your usage spikes during business hours. We feel for you. We really do.</div>
+        </div>
+
+        <div class="data-card">
+          <span class="data-tag">Temporal</span>
+          <div class="data-title">3am Chaos Score</div>
+          <div class="data-desc">What were you doing typing sarcastic messages at 3 in the morning? We have theories. We're not sharing them. But we have them.</div>
+        </div>
+
+      </div>
+
+      <div class="actually">
+        <p><strong>Okay but actually:</strong> We collect none of this. Zero. We don't have servers. We don't have spreadsheets. We couldn't tell you your sarcasm level if our lives depended on it. The app works entirely on your device and has never, not once, phoned home. We just wanted you to read a privacy policy for once in your life.</p>
+      </div>
+    </div>
+
+    <!-- What we really don't collect -->
+    <div class="policy-section">
+      <h2>2. The Boring List of Things We Actually Don't Collect</h2>
+      <p>For legal completeness — and because Apple asked nicely — here is the real list of data we do not collect, have never collected, and have no interest in collecting:</p>
+
+      <ul class="strike-list">
+        <li>Your name, email, phone number, or any identifying information</li>
+        <li>What you type — the keyboard transforms text on-device and forgets it immediately</li>
+        <li>Your location, contacts, photos, camera, or microphone</li>
+        <li>Device identifiers, IP addresses, or advertising IDs</li>
+        <li>Crash reports or analytics data of any kind</li>
+        <li>Usage statistics, session lengths, or feature engagement</li>
+        <li>Anything that has ever left your phone</li>
+      </ul>
+
+      <p>Sarcasm Keyboard makes <strong>zero network requests</strong>. It doesn't need the internet. It doesn't want the internet. It is, by design, blissfully unaware that the internet exists.</p>
+    </div>
+
+    <!-- Keyboard extension -->
+    <div class="policy-section">
+      <h2>3. The Keyboard — Yes, We Know That's a Sensitive One</h2>
+      <p>You gave a keyboard access to your typing. That's a lot of trust. We take it seriously even when we're not taking other things seriously.</p>
+      <p>iOS requires that keyboard extensions ask for "Full Access" before they can do things like make network requests or access the clipboard. <strong>Sarcasm Keyboard does not request Full Access.</strong> We don't need it. The keyboard transforms your text locally, in memory, and hands it back to whatever app you're typing in. That's the whole thing.</p>
+      <p>The only thing that ever gets saved is the <strong>transformed output</strong> — the sarcastic version — if you let it land in History. Not what you typed originally. Just the funny version. Because that's all we care about.</p>
+    </div>
+
+    <!-- History -->
+    <div class="policy-section">
+      <h2>4. History — Your Greatest Hits, Locally Stored</h2>
+      <p>The app keeps a local log of your transformed text so you can copy that masterpiece you typed three days ago. This data:</p>
+      <ul class="strike-list">
+        <li>Never syncs to iCloud</li>
+        <li>Never touches our servers (we don't have any)</li>
+        <li>Never gets shared with anyone</li>
+      </ul>
+      <p>You can delete individual entries, or nuke all of it at once from the History tab. We will not be offended. We will not remember. We will not know.</p>
+    </div>
+
+    <!-- IAP -->
+    <div class="policy-section">
+      <h2>5. In-App Purchases — We Like Money, Apple Handles It</h2>
+      <p>Sarcasm Keyboard Pro is a one-time purchase. All payment processing is done by Apple through the App Store. We receive <strong>exactly one piece of information</strong>: that a purchase happened. That's it. No card details, no billing address, nothing.</p>
+      <p>We store a single boolean on your device that says you've unlocked Pro. It says <code style="font-family: 'SF Mono', monospace; font-size: 13px; color: var(--green); background: rgba(181,240,80,0.08); padding: 2px 6px; border-radius: 4px;">true</code>. It does not know your name.</p>
+    </div>
+
+    <!-- Changes -->
+    <div class="policy-section">
+      <h2>6. Changes to This Policy</h2>
+      <p>If this policy ever needs to change in a meaningful way — which would only happen if we added some actual data collection, which we currently have zero plans to do — we'll update the date above and mention it in the App Store release notes.</p>
+      <p>If the change is significant, we'll make the sarcasm louder so you notice.</p>
+    </div>
+
+    <!-- Contact -->
+    <div class="policy-section" id="contact">
+      <h2>7. Questions? Concerns? Unsolicited Opinions?</h2>
+      <p>If you read this whole thing and still have questions, we genuinely respect the commitment. We respond to real questions. Vibes are optional.</p>
+      <div class="contact-form">
+        <form id="contactForm">
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" placeholder="What do we call you?" required>
+          <label for="cf-email">Your email</label>
+          <input type="email" id="cf-email" name="email" placeholder="So we can write back" required>
+          <label for="cf-message">Message</label>
+          <textarea id="cf-message" name="message" placeholder="Ask away. We can take it." required></textarea>
+          <button type="submit" id="cf-btn">Send Message</button>
+          <div class="form-status" id="cf-status">✓ Sent. We'll get back to you.</div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div>
+      <a href="/">Sarcasm Keyboard</a> &nbsp;·&nbsp;
+      <a href="/privacy">Privacy Policy</a>
+      &nbsp;·&nbsp; &copy; 2025 &nbsp;·&nbsp; nO dAtA wAs HaRmEd In ThE mAkInG oF tHiS dOcUmEnT
+    </div>
+  </footer>
+
+<script>
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('cf-btn');
+    const status = document.getElementById('cf-status');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    const data = {
+      name: document.getElementById('cf-name').value,
+      email: document.getElementById('cf-email').value,
+      message: document.getElementById('cf-message').value
+    };
+    try {
+      const res = await fetch('https://formspree.io/f/FORMSPREE_ID', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        status.style.display = 'block';
+        this.reset();
+      } else {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
