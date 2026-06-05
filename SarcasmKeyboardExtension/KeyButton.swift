@@ -38,18 +38,11 @@ struct KeyButton: View {
             labelView
                 .foregroundColor(palette.text)
                 .frame(maxWidth: .infinity)
-                .frame(height: 42)
+                .frame(height: 51)
                 .background(
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
-                            .fill(isPressed ? palette.accent.opacity(0.30) : backgroundColor)
-                        VStack(spacing: 0) {
-                            palette.topHighlight
-                                .frame(height: 1)
-                            Color.clear
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-                    }
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(isPressed ? palette.accent.opacity(0.30) : backgroundColor)
+                        .shadow(color: .black.opacity(0.22), radius: 0, x: 0, y: 1)
                 )
         }
         .buttonStyle(.plain)

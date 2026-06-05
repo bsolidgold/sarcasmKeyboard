@@ -5,7 +5,6 @@ import SarcasmKit
 final class KeyboardViewController: UIInputViewController {
     private var hostingController: UIHostingController<KeyboardView>?
     private var historySession: HistorySession?
-
     override func viewDidLoad() {
         super.viewDidLoad()
         KeyboardStatus.recordHeartbeat()

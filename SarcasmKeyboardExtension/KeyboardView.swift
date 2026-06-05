@@ -41,37 +41,46 @@ struct KeyboardView: View {
     }
 
     @ViewBuilder private var keyRows: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 0) {
             switch layout {
             case .letters: lettersLayout
             case .numbers: numbersLayout
             case .symbols: symbolsLayout
             }
         }
-        .padding(.vertical, 6)
         .padding(.horizontal, 4)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: Layouts
 
     @ViewBuilder private var lettersLayout: some View {
+        Spacer(minLength: 6)
         letterRow(lettersRow1)
+        Spacer(minLength: 6)
         letterRow(lettersRow2)
             .padding(.horizontal, 18)
+        Spacer(minLength: 6)
         HStack(spacing: 6) {
+            KeyButton(icon: "shift", style: .system, palette: palette) {}
+                .frame(width: 46)
             ForEach(Array(lettersRow3), id: \.self) { c in
                 KeyButton(label: String(c), style: .letter, palette: palette) { onLetter(c) }
             }
             KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
-                .frame(width: 56)
+                .frame(width: 46)
         }
+        Spacer(minLength: 6)
         bottomRow(switcherLabel: "123") { layout = .numbers }
+        Spacer(minLength: 6)
     }
 
     @ViewBuilder private var numbersLayout: some View {
+        Spacer(minLength: 6)
         charRow(numbersRow1, transform: false)
+        Spacer(minLength: 6)
         charRow(numbersRow2, transform: false)
+        Spacer(minLength: 6)
         HStack(spacing: 6) {
             KeyButton(label: "#+=", style: .system, palette: palette) { layout = .symbols }
                 .frame(width: 56)
@@ -81,12 +90,17 @@ struct KeyboardView: View {
             KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
                 .frame(width: 56)
         }
+        Spacer(minLength: 6)
         bottomRow(switcherLabel: "ABC") { layout = .letters }
+        Spacer(minLength: 6)
     }
 
     @ViewBuilder private var symbolsLayout: some View {
+        Spacer(minLength: 6)
         charRow(symbolsRow1, transform: false)
+        Spacer(minLength: 6)
         charRow(symbolsRow2, transform: false)
+        Spacer(minLength: 6)
         HStack(spacing: 6) {
             KeyButton(label: "123", style: .system, palette: palette) { layout = .numbers }
                 .frame(width: 56)
@@ -96,7 +110,9 @@ struct KeyboardView: View {
             KeyButton(icon: "delete.left", style: .system, palette: palette, action: onDelete)
                 .frame(width: 56)
         }
+        Spacer(minLength: 6)
         bottomRow(switcherLabel: "ABC") { layout = .letters }
+        Spacer(minLength: 6)
     }
 
     // MARK: Row helpers
@@ -123,10 +139,12 @@ struct KeyboardView: View {
     private func bottomRow(switcherLabel: String, switcherAction: @escaping () -> Void) -> some View {
         HStack(spacing: 6) {
             KeyButton(label: switcherLabel, style: .system, palette: palette, action: switcherAction)
-                .frame(width: 64)
+                .frame(width: 46)
+            KeyButton(icon: "face.smiling", style: .system, palette: palette) {}
+                .frame(width: 46)
             KeyButton(label: "space", style: .system, palette: palette, action: onSpace)
-            KeyButton(label: "return", style: .system, palette: palette, action: onReturn)
-                .frame(width: 80)
+            KeyButton(icon: "return", style: .system, palette: palette, action: onReturn)
+                .frame(width: 90)
         }
     }
 }
